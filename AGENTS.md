@@ -38,7 +38,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ planned. Owners: **bot-agent** (this
 | `packages/db` schema + migrations + repositories | ✅ | bot-agent | 25 tables, Drizzle |
 | Bot framework (sharding, router, permissions, V2 UI kit) | ✅ | bot-agent | |
 | `/help` `/about` `/ping` `/setup` `/logs` `/case` | ✅ | bot-agent | |
-| Core engine: normalizer, word lists, matcher, risk engine, verification evaluator | ⏳ | bot-agent | Phase 2 (website needs `evaluateVerification`) |
+| Core engine: normalizer, 2800+ word lists, matcher, risk engine, verification evaluator | ✅ | bot-agent | `evaluateVerification` / `scoreIdentityLink` ready for the website |
 | AutoMod module (detectors, BYOK AI, policies, templates) | ⏳ | bot-agent | Phase 3 |
 | Anti-Nuke + Anti-Raid + snapshots/recovery + worker jobs | ⏳ | bot-agent | Phase 4 |
 | Verification (bot side), SSO, evasion, member backup job | ⏳ | bot-agent | Phase 5 |
@@ -76,8 +76,9 @@ Quill-Bot/
 └─ packages/
    ├─ shared/               ← zod config schemas, contracts, crypto, brand   (both sides)
    ├─ db/                   ← Drizzle schema, migrations, repositories      (both sides)
-   └─ core/                 ← framework-free engine: normalizer, detectors, risk, anti-nuke scoring,
-                               verification matcher (bot + website import it)
+   └─ core/                 ← framework-free engine (runs in Node + browsers): normalizer, 2800+ word
+                               lists, Aho-Corasick matcher, risk engine, verification evaluator;
+                               detectors + anti-nuke scoring land here next (see packages/core/AGENTS.md)
 ```
 
 Workspace packages are consumed **as TypeScript source** (`exports` → `./src/*.ts`). Anything
@@ -284,6 +285,14 @@ overwrite); put the QUILL role at the top of the role list; add the website's OA
 ---
 
 ## 11. Changelog
+
+- **Phase 2 — Core engine** (bot-agent): `normalize()` (NFKC, invisible chars, Zalgo/diacritics,
+  homoglyphs incl. Cyrillic/Greek/emoji letters/small caps/upside-down, context-aware leetspeak,
+  single-letter joining, repetition views); Aho-Corasick `WordMatcher` with collision-safe
+  collapsing and span rules; **2807 built-in terms** in 10 categories and 14 languages with a
+  validator (dictionary Scunthorpe check) and a false-positive corpus test; `evaluateRisk()`;
+  `scoreIdentityLink()` + `evaluateVerification()` for the website. Word filter default
+  `minSeverity` is now 2.
 
 - **Phase 1 — Foundation** (bot-agent): monorepo + tooling; shared config schemas/contracts/crypto;
   Drizzle schema (25 tables) + init migration + repositories with integration tests; bot framework

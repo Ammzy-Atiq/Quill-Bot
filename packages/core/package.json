@@ -16,6 +16,7 @@
     "@quill/shared": "workspace:*"
   },
   "devDependencies": {
-    "tsx": "4.23.15"
+    "tsx": "4.23.15",
+    "an-array-of-english-words": "2.0.0"
   }
 }

@@ -70,6 +70,9 @@ importers:
         specifier: workspace:*
         version: link:../shared
     devDependencies:
+      an-array-of-english-words:
+        specifier: 2.0.0
+        version: 2.0.0
       tsx:
         specifier: 4.23.15
         version: 4.23.15
@@ -1267,6 +1270,10 @@ packages:
   acorn@8.18.0:
     resolution: {integrity: sha512-lGq+9yr1/GuAWaVYIHRjvvySG5/4VfKIvC8EWxStPdcDh/Ka7FG3twP6v4d5BkravUilhIAsG4Qj83t02LWUPQ==}
     engines: {node: '>=0.4.0'}
+    hasBin: true
+
+  an-array-of-english-words@2.0.0:
+    resolution: {integrity: sha512-FXnNvZSOI27kkKXeLSquhaTGP7z198UOQ4txaYO9fCfrjCh+D5SV7G7XqzEH0229+pAi4cjBEZ4WIQYgjKtO7Q==}
     hasBin: true
 
   any-promise@1.3.0:
@@ -2739,6 +2746,8 @@ snapshots:
   '@vladfrangu/async_event_emitter@2.4.7': {}
 
   acorn@8.18.0: {}
+
+  an-array-of-english-words@2.0.0: {}
 
   any-promise@1.3.0: {}
 

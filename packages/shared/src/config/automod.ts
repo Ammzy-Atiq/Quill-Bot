@@ -36,8 +36,11 @@ export const WordsDetectorSchema = z
     disabledTermIds: z.array(z.string().max(64)).max(5000).default([]),
     /** Words that must never be flagged (after normalisation). */
     allowlist: z.array(z.string().min(1).max(64)).max(1000).default([]),
-    /** Ignore hits below this severity. */
-    minSeverity: z.number().int().min(1).max(5).default(1),
+    /**
+     * Ignore hits below this severity. Default 2: severity-1 terms are mild words
+     * ("stupid", "naked", gaming trash talk) that only count when a server lowers this.
+     */
+    minSeverity: z.number().int().min(1).max(5).default(2),
   })
   .prefault({});
 
