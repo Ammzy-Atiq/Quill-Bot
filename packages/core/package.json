@@ -1,0 +1,21 @@
+{
+  "name": "@quill/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "QUILL GUARD core engine (framework-free): normalizer, word lists, detectors, risk engine, anti-nuke & anti-raid scoring, verification matcher.",
+  "author": "Atiq Ur Rahman",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "wordlist:validate": "tsx scripts/validate-wordlists.ts"
+  },
+  "dependencies": {
+    "@quill/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "4.23.15"
+  }
+}

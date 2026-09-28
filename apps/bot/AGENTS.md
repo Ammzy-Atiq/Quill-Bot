@@ -1,0 +1,52 @@
+# AGENTS.md — apps/bot (Discord bot)
+
+Owner: **bot-agent**. Read the root `AGENTS.md` first — the rules there (Components V2 only, no
+accent colour, permission model, privacy) apply here.
+
+## Layout
+| Path | What |
+|---|---|
+| `src/index.ts` | Production entry: runs migrations, spawns shards (`ShardingManager`) |
+| `src/shard.ts` | One shard; also the dev entry. `--dry-run` = boot check without secrets |
+| `src/worker.ts`, `src/worker/*` | BullMQ worker (REST only): retention, restores, member pulls |
+| `src/app.ts` | `App` container passed everywhere (client, env, logger, db, store, services) |
+| `src/client.ts` | Intents, partials, cache limits |
+| `src/framework/` | `types.ts` (SlashCommand, ComponentHandler, EventHandler, BotModule, UserError), `router.ts`, `permissions.ts`, `custom-id.ts`, `registry.ts` |
+| `src/ui/` | `Card` builder, presets (success/error/warning/info/confirm), `reply`/`update`/`send`, V2 limit checks, emojis |
+| `src/services/` | `configs` (cached guild config + updates), `trust` (extra owners/whitelist), `logs` (log channels), `cases` |
+| `src/modules/<name>/` | Feature modules. Each exports a `BotModule` registered in `src/modules/index.ts` |
+| `src/lib/` | store (Redis/memory), LRU, formatting, links, migrations |
+
+## Add a command
+```ts
+// src/modules/example/index.ts
+export const exampleModule: BotModule = {
+  name: 'general',
+  commands: [{
+    module: 'general',
+    permission: 'manager',                       // everyone | moderator | manager | extra_owner | owner
+    subcommandPermissions: { reset: 'owner' },    // optional per-subcommand override
+    data: new SlashCommandBuilder().setName('example').setDescription('…'),
+    async execute({ app, interaction, guild, config }) {
+      await reply(interaction, successCard('Done'), { ephemeral: true });
+    },
+  }],
+};
+```
+Then add it to `MODULES` in `src/modules/index.ts`, run `pnpm commands:manifest` and
+`pnpm commands:deploy --dev`.
+
+## Add a button / select / modal handler
+- Build ids with `lockedId(interaction.user.id, '<module>', '<action>', ...args)` (or `cid()` for
+  public buttons such as the verification panel).
+- Register `{ id: '<module>:<action>', permission, locked: true, execute }` in the module's
+  `components`. The router checks the lock and permission, loads config, catches errors.
+- Re-render panels with `update(interaction, newContainer)`.
+
+## Rules of thumb
+- Throw `new UserError('message', 'Title')` for expected failures — the router shows an error card.
+- Settings changes go through `app.configs.set/update/reset` (validates, audits, broadcasts).
+- Use `app.logs.send(guild, category, card)` for log channels and `app.cases.create()` for cases.
+- Long work (> 3 s): `deferReply`, then `reply()` (it edits the deferred reply with the V2 flag).
+- Anything heavy or rate-limit bound across many objects (restore, member pull) → worker queue.
+- Tests live in `test/`; UI builders must stay within V2 limits (see `test/ui.test.ts`).

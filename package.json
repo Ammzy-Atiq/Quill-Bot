@@ -1,0 +1,37 @@
+{
+  "name": "quill-guard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "QUILL GUARD — an advanced Discord security bot: AutoMod, Verification and Anti-Nuke.",
+  "author": "Atiq Ur Rahman",
+  "license": "UNLICENSED",
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "pnpm --filter @quill/bot build",
+    "typecheck": "pnpm -r --parallel typecheck",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:generate": "pnpm --filter @quill/db generate",
+    "db:migrate": "pnpm --filter @quill/db migrate",
+    "db:studio": "pnpm --filter @quill/db studio",
+    "dev:bot": "pnpm --filter @quill/bot dev",
+    "dev:worker": "pnpm --filter @quill/bot dev:worker",
+    "commands:deploy": "pnpm --filter @quill/bot commands:deploy",
+    "commands:manifest": "pnpm --filter @quill/bot commands:manifest",
+    "wordlist:validate": "pnpm --filter @quill/core wordlist:validate",
+    "check": "pnpm lint && pnpm typecheck && pnpm test"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.14",
+    "@types/node": "^22.15.0",
+    "typescript": "7.0.2",
+    "vitest": "5.0.2"
+  }
+}

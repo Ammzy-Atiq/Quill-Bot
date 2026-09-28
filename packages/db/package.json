@@ -1,0 +1,28 @@
+{
+  "name": "@quill/db",
+  "version": "0.1.0",
+  "private": true,
+  "description": "QUILL GUARD database: Drizzle ORM schema, migrations and repositories (PostgreSQL).",
+  "author": "Atiq Ur Rahman",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "generate": "drizzle-kit generate",
+    "migrate": "tsx src/migrate.ts",
+    "studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@quill/shared": "workspace:*",
+    "drizzle-orm": "0.45.3",
+    "pg": "8.23.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.0",
+    "drizzle-kit": "0.31.11",
+    "tsx": "4.23.15"
+  }
+}

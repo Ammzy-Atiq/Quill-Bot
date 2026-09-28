@@ -1,0 +1,67 @@
+# QUILL GUARD local / single-server stack.
+#   Infra only (for `pnpm dev:bot`):  docker compose up -d postgres redis
+#   Everything:                       docker compose up -d --build
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: quill
+      POSTGRES_PASSWORD: quill
+      POSTGRES_DB: quill
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quill -d quill"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  bot:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://quill:quill@postgres:5432/quill
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["node", "dist/index.js"]
+
+  worker:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://quill:quill@postgres:5432/quill
+      REDIS_URL: redis://redis:6379
+      AUTO_MIGRATE: "false"
+    depends_on:
+      bot:
+        condition: service_started
+    command: ["node", "dist/worker.js"]
+
+volumes:
+  pgdata:
+  redisdata:

@@ -1,0 +1,25 @@
+{
+  "name": "@quill/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "QUILL GUARD shared contracts: config schemas, bot<->website contracts, crypto helpers, brand tokens.",
+  "author": "Atiq Ur Rahman",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./config": "./src/config/index.ts",
+    "./contracts": "./src/contracts/index.ts",
+    "./crypto": "./src/crypto.ts",
+    "./brand": "./src/brand.ts",
+    "./actions": "./src/actions.ts",
+    "./wordlists": "./src/wordlists.ts",
+    "./constants": "./src/constants.ts",
+    "./redis": "./src/contracts/redis.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "zod": "4.6.5"
+  }
+}
