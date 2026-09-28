@@ -43,7 +43,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ planned. Owners: **bot-agent** (this
 | Anti-Nuke + Anti-Raid engine (`packages/core`) | ✅ | bot-agent | trust model, strict/threshold, threat scoring, anti-betray, 8 red-team scenarios, join evaluation |
 | Anti-Nuke + Anti-Raid services (`apps/bot`) | ✅ | bot-agent | audit-log mapping, punish, revert (incl. retroactive), live incident cards, emergency mode, snapshots + restore, raid mode |
 | Anti-Nuke commands + events (`/antinuke /whitelist /extraowner /emergency /backup /antiraid /incident`) | ✅ | bot-agent | panel, audit, red-team simulate, whitelist panel, confirmations, live incident buttons, snapshot restore with progress |
-| Shared verification repository (`verificationRepo` in `packages/db`) | ⏳ | bot-agent | **Next**; signatures in `apps/website/AGENTS.md` §6 |
+| Shared verification repository (`verificationRepo` in `packages/db`) | ✅ | bot-agent | sessions, grants, fingerprints, alt graph, standing, network bans, statuses, deletion — API in `apps/website/AGENTS.md` §6 |
 | Verification (bot side), SSO, evasion, member backup job | ⏳ | bot-agent | Phase 5 |
 | Moderation commands, `/messages`, native AutoMod sync | ⏳ | bot-agent | Phase 6 |
 | Website (landing, verify flow, OAuth, fingerprint, dashboard) | ⏳ ready to start | website-agent | Spec: `apps/website/AGENTS.md` — begin with §0 *Start here* |
@@ -387,6 +387,12 @@ overwrite); put the QUILL role at the top of the role list; add the website's OA
 ---
 
 ## 11. Changelog
+
+- **`verificationRepo`** (bot-agent): shared verification repository in `packages/db` for the
+  website flow and the bot's Phase 5 — single-use sessions, encrypted OAuth grants, hashed
+  fingerprints, alt candidates + identity links (strongest evidence kept), standing in a guild,
+  opt-in network ban counts, guild verification status, SSO identity, backup consent, flagged
+  reviews, data deletion. 5 integration tests.
 
 - **Docs — ready for parallel website work** (bot-agent): `apps/website/AGENTS.md` gained §0
   *Start here* (setup checklist, what already exists, ownership, git workflow, dev helpers), a

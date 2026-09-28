@@ -18,7 +18,7 @@ Shared by the bot and the website.
   | `automodRepo` | `automod.ts` | custom words, policies, scam domains / image hashes, encrypted AI credentials |
   | `banRepo` | `bans.ts` | `guild_bans` mirror (ban-evasion checks) |
   | `securityRepo` | `security.ts` | incidents, security events, snapshots (`latestSnapshot(…, before)`), emergency state |
-  | `verificationRepo` | `verification.ts` | ⏳ next (bot-agent) — sessions, grants, fingerprints, identity links, guild verifications; signatures in `apps/website/AGENTS.md` §6 |
+  | `verificationRepo` | `verification.ts` | sessions, OAuth grants, fingerprints, alt candidates + identity links, standing, network bans, guild verifications, SSO identities, backup consent, data deletion (API: `apps/website/AGENTS.md` §6) |
 - Owner: **bot-agent** (schema, migrations, repositories). The website keeps website-only
   queries in `apps/website/src/server/db/` and requests schema changes under root §10 *Open issues*.
 - Snowflakes: `varchar(20)`. Timestamps: `timestamptz`. JSONB columns are typed with `$type<>()`.

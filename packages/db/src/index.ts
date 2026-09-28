@@ -8,4 +8,5 @@ export { ConfigVersionConflictError } from './repositories/guilds.js';
 export * as riskRepo from './repositories/risk.js';
 export * as securityRepo from './repositories/security.js';
 export * as trust from './repositories/trust.js';
+export * as verificationRepo from './repositories/verification.js';
 export * as schema from './schema/index.js';

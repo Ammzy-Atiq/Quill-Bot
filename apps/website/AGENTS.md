@@ -50,7 +50,7 @@
 | Crypto (AES-GCM secrets, HMAC hashes, IP prefix, masking) | ✅ | `@quill/shared/crypto` (server-only) |
 | Brand tokens | ✅ | `BRAND` — `@quill/shared/brand`; logo in `assets/brand/` |
 | DB schema + repositories (`guildRepo`, `trust`, `cases`, `banRepo`, `riskRepo`, `automodRepo`, `securityRepo`) | ✅ | `@quill/db` (+ `@quill/db/schema`) |
-| Shared **verification repository** (`verificationRepo`, signatures in §6) | ⏳ bot-agent, lands before you need it (milestone 2) | `@quill/db` |
+| Shared **verification repository** (`verificationRepo`, API in §6) | ✅ with integration tests | `@quill/db` |
 | Commands manifest for `/commands` | ✅ regenerated every bot phase | `apps/bot/commands.manifest.json` |
 | Bot reacts to `quill:config:invalidate` / `quill:trust:invalidate` | ✅ | dashboard edits apply instantly |
 | Bot "Verify" button that sends members to your site | ⏳ bot Phase 5 | meanwhile: `pnpm verify:link <guildId> <userId>` (§0.4) |
@@ -467,23 +467,29 @@ securityRepo.listIncidents / getIncident(db, guildId, number) / incidentEvents /
 securityRepo.listSnapshots / getEmergency;   riskRepo.topRisk;   automodRepo.listCustomWords / listPolicies / getAiCredential
 ```
 
-**`verificationRepo` (shared, bot-agent — lands before your milestone 2).** Planned signatures:
+**`verificationRepo`** (`@quill/db`, shared with the bot — `packages/db/src/repositories/verification.ts`):
 ```ts
-createSession(db, { guildId, userId, nonce, expiresAt }) → SessionRow | null      // null = nonce already used
+createSession(db, { guildId, userId, nonce, expiresAt }) → SessionRow | null      // null = token nonce already used
 getSession(db, id) → SessionRow | undefined
-completeSession(db, id, { verdict, confidence, reasons, linkedUserIds, backupConsent })
-failSession(db, id, status: 'expired' | 'failed')
-upsertOAuthGrant(db, { userId, accessTokenEnc, refreshTokenEnc, scopes, expiresAt })
-insertFingerprint(db, { userId, ipHash, ipPrefixHash, deviceHash, signals, asn, country, isProxy })
-findLinkCandidates(db, { userId, ipHash, ipPrefixHash, deviceHash, sinceDays }) → [{ userId, signals, lastSeenAt }]
-upsertIdentityLink(db, userX, userY, confidence, signals)                        // orders the pair itself
-standingInGuild(db, guildId, userIds) → Map<userId, { banned, punished }>
-setGuildVerification(db, { guildId, userId, status, method, sessionId?, reviewedBy?, backupConsent? })
-touchVerifiedIdentity(db, userId)
-deleteUserData(db, userId) → counts
+completeSession(db, id, { verdict, confidence, reasons, linkedUserIds, backupConsent }) → boolean   // false = not pending
+failSession(db, id, 'expired' | 'failed') → boolean
+upsertOAuthGrant(db, { userId, accessTokenEnc, refreshTokenEnc, scopes, expiresAt });  getOAuthGrant(db, userId)
+insertFingerprint(db, { userId, ipHash, ipPrefixHash, deviceHash, signals, asn, country, isProxy }) → FingerprintRow
+findLinkCandidates(db, { userId, ipHash, ipPrefixHash, deviceHash, sinceDays })
+  → [{ userId, signals: ('device'|'ip'|'ip_prefix')[], lastSeenAt, viaProxy }]   // strongest first
+upsertIdentityLink(db, userX, userY, confidence, signals)   // orders the pair; keeps the strongest confidence, merges signals
+linkedAccounts(db, userId, minConfidence?) → [{ userId, confidence, signals, lastSeenAt }]
+standingInGuild(db, guildId, userIds, punishedDays = 30) → Map<userId, { banned, punished }>
+networkBanCounts(db, userIds, excludeGuildId) → Map<userId, number>   // only guilds with verification.network.shareSignals
+setGuildVerification(db, { guildId, userId, status, method, sessionId?, reviewedBy?, backupConsent? })  // omitted fields keep old values
+getGuildVerification(db, guildId, userId);  listFlagged(db, guildId, limit?) → [{ verification, session }]
+backupConsentingUserIds(db, guildId) → userId[]
+touchVerifiedIdentity(db, userId);  getVerifiedIdentity(db, userId)
+deleteUserData(db, userId) → { fingerprints, identityLinks, oauthGrants, verifiedIdentities, sessions, guildVerificationsRevoked }
 ```
-If you reach milestone 2 first, pull; if it is still missing, implement exactly these signatures in
-`packages/db/src/repositories/verification.ts`, export it as `verificationRepo`, and note it in §11.
+Only store identity links whose `scoreIdentityLink` confidence is meaningful (e.g. ≥ 0.3): a shared
+network prefix alone is weak evidence. Revoke the OAuth token at Discord **before** `deleteUserData`
+(read it with `getOAuthGrant` + `decryptSecret`).
 
 ---
 
