@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-28T10:44:23.098Z",
+  "generatedAt": "2026-09-28T10:59:14.036Z",
   "commands": [
     {
       "module": "general",
@@ -2106,7 +2106,11 @@
       "module": "backup",
       "permission": "extra_owner",
       "permissionLabel": "Server owner or extra owner",
-      "subcommandPermissions": {},
+      "subcommandPermissions": {
+        "server add": "owner",
+        "server remove": "owner",
+        "members pull": "owner"
+      },
       "options": [
         {
           "type": 1,
@@ -2183,6 +2187,71 @@
               "name": "id",
               "description": "Snapshot",
               "required": true
+            }
+          ]
+        },
+        {
+          "type": 2,
+          "name": "server",
+          "description": "Backup servers for member recovery (members who consented can be re-added).",
+          "options": [
+            {
+              "type": 1,
+              "name": "add",
+              "description": "Register a backup server you also own (run in your main server).",
+              "options": [
+                {
+                  "type": 3,
+                  "name": "server_id",
+                  "description": "Backup server ID — QUILL must be in it",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "remove",
+              "description": "Unregister a backup server.",
+              "options": [
+                {
+                  "type": 3,
+                  "name": "server_id",
+                  "description": "Backup server ID",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "list",
+              "description": "List backup servers of this server.",
+              "options": []
+            }
+          ]
+        },
+        {
+          "type": 2,
+          "name": "members",
+          "description": "Re-add verified members who consented (run in the backup server).",
+          "options": [
+            {
+              "type": 1,
+              "name": "pull",
+              "description": "Re-add consenting members of your main server into this backup server.",
+              "options": [
+                {
+                  "type": 3,
+                  "name": "main_server_id",
+                  "description": "ID of the main server",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "status",
+              "description": "Recent member pulls into this server.",
+              "options": []
             }
           ]
         }
@@ -2457,6 +2526,307 @@
       "name": "antiraid",
       "description": "Anti-Raid: join spikes, raid mode and join filters.",
       "default_member_permissions": "32",
+      "type": 1
+    },
+    {
+      "module": "verification",
+      "permission": "manager",
+      "permissionLabel": "Manage Server",
+      "subcommandPermissions": {
+        "status": "moderator"
+      },
+      "options": [
+        {
+          "type": 1,
+          "name": "setup",
+          "description": "Choose the roles and turn verification on.",
+          "options": [
+            {
+              "name": "verified_role",
+              "description": "Given after verification",
+              "required": true,
+              "type": 8
+            },
+            {
+              "name": "unverified_role",
+              "description": "Given on join until verified (optional)",
+              "required": false,
+              "type": 8
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Website — Discord login + alt / ban-evasion checks",
+                  "value": "oauth"
+                },
+                {
+                  "name": "One-click button",
+                  "value": "simple"
+                }
+              ],
+              "name": "mode",
+              "description": "How members verify (default: website)",
+              "required": false
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "panel",
+          "description": "Post the verification panel.",
+          "options": [
+            {
+              "channel_types": [
+                0,
+                5
+              ],
+              "name": "channel",
+              "description": "Channel (default: here)",
+              "required": false,
+              "type": 7
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "settings",
+          "description": "Evasion policy, SSO, timers and more.",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Website",
+                  "value": "oauth"
+                },
+                {
+                  "name": "One-click",
+                  "value": "simple"
+                }
+              ],
+              "name": "mode",
+              "description": "Verification mode",
+              "required": false
+            },
+            {
+              "name": "assign_unverified",
+              "description": "Give the unverified role on join",
+              "required": false,
+              "type": 5
+            },
+            {
+              "max_value": 10080,
+              "min_value": 0,
+              "type": 4,
+              "name": "kick_after_minutes",
+              "description": "Kick unverified members after N minutes (0 = never)",
+              "required": false
+            },
+            {
+              "name": "check_alts",
+              "description": "Look for alts of punished members",
+              "required": false,
+              "type": 5
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Flag for staff review",
+                  "value": "flag"
+                },
+                {
+                  "name": "Block automatically",
+                  "value": "block"
+                }
+              ],
+              "name": "on_match",
+              "description": "When an alt / evader is found",
+              "required": false
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Ban",
+                  "value": "ban"
+                },
+                {
+                  "name": "Kick",
+                  "value": "kick"
+                },
+                {
+                  "name": "None",
+                  "value": "none"
+                }
+              ],
+              "name": "block_action",
+              "description": "Action when blocked",
+              "required": false
+            },
+            {
+              "max_value": 1,
+              "min_value": 0.3,
+              "type": 10,
+              "name": "min_confidence",
+              "description": "Match confidence needed, 0.3–1 (default 0.75)",
+              "required": false
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Allowed",
+                  "value": "allow"
+                },
+                {
+                  "name": "Flagged",
+                  "value": "flag"
+                },
+                {
+                  "name": "Blocked",
+                  "value": "block"
+                }
+              ],
+              "name": "vpn_policy",
+              "description": "VPN / proxy users are…",
+              "required": false
+            },
+            {
+              "max_value": 365,
+              "min_value": 0,
+              "type": 4,
+              "name": "min_account_age",
+              "description": "Flag accounts younger than N days (0 = off)",
+              "required": false
+            },
+            {
+              "name": "sso",
+              "description": "Accept members verified in other QUILL servers",
+              "required": false,
+              "type": 5
+            },
+            {
+              "max_value": 365,
+              "min_value": 1,
+              "type": 4,
+              "name": "sso_max_age_days",
+              "description": "How recent an SSO verification must be",
+              "required": false
+            },
+            {
+              "name": "share_signals",
+              "description": "Share ban signals with other opted-in servers",
+              "required": false,
+              "type": 5
+            },
+            {
+              "name": "backup_consent",
+              "description": "Ask members to consent to backup-server re-adds",
+              "required": false,
+              "type": 5
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "status",
+          "description": "A member's verification status and linked accounts.",
+          "options": [
+            {
+              "name": "user",
+              "description": "Member",
+              "required": true,
+              "type": 6
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "approve",
+          "description": "Verify a member (e.g. after a review).",
+          "options": [
+            {
+              "name": "user",
+              "description": "Member",
+              "required": true,
+              "type": 6
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "deny",
+          "description": "Deny a member's verification.",
+          "options": [
+            {
+              "name": "user",
+              "description": "Member",
+              "required": true,
+              "type": 6
+            },
+            {
+              "type": 3,
+              "name": "reason",
+              "description": "Reason (sent to the member)",
+              "required": false,
+              "max_length": 300
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "whitelist",
+          "description": "Toggle a user who always passes verification.",
+          "options": [
+            {
+              "name": "user",
+              "description": "User",
+              "required": true,
+              "type": 6
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "disable",
+          "description": "Turn verification off.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "view",
+          "description": "Show the verification settings.",
+          "options": []
+        }
+      ],
+      "name": "verification",
+      "description": "Verification: website login, alt & ban-evasion checks, SSO.",
+      "default_member_permissions": "32",
+      "type": 1
+    },
+    {
+      "module": "verification",
+      "permission": "everyone",
+      "permissionLabel": "Everyone",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "type": 1,
+          "name": "view",
+          "description": "See what QUILL stores about you.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "delete",
+          "description": "Delete your verification data everywhere.",
+          "options": []
+        }
+      ],
+      "name": "data",
+      "description": "Your QUILL GUARD data: see or delete what verification stored about you.",
       "type": 1
     }
   ]

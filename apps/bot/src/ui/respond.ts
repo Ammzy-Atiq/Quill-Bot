@@ -80,6 +80,15 @@ export async function reply(interaction: RepliableInteraction, containers: Conta
   return interaction.reply(v2Reply(containers, opts));
 }
 
+/** Always a new follow-up message (e.g. an ephemeral note after `deferUpdate`). */
+export async function followUp(
+  interaction: RepliableInteraction,
+  containers: Containers,
+  opts: V2Options = {},
+) {
+  return interaction.followUp(v2Reply(containers, opts));
+}
+
 /** Updates the message a button/select belongs to (the message must already be V2). */
 export async function update(
   interaction: RepliableInteraction & { update: (o: MessageEditOptions) => Promise<unknown> },

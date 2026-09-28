@@ -7,6 +7,7 @@ import { coreModule } from './core/index.js';
 import { generalModule } from './general/index.js';
 import { loggingModule } from './logging/index.js';
 import { banMirrorEvents } from './moderation/quick-actions.js';
+import { verificationModule } from './verification/index.js';
 
 /**
  * Every bot module. Add new modules here — the registry wires their commands,
@@ -20,4 +21,5 @@ export const MODULES: BotModule[] = [
   automodModule,
   antinukeModule,
   antiraidModule,
+  verificationModule,
 ];

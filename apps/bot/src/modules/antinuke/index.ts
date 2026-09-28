@@ -4,6 +4,7 @@ import { antinukeCommand } from './antinuke-command.js';
 import { backupCommand, backupComponents } from './backup-command.js';
 import { emergencyCommand } from './emergency-command.js';
 import { incidentCommand, incidentComponents } from './incident-command.js';
+import { memberBackupComponents } from './member-backup.js';
 import { antinukePanelComponents } from './panel.js';
 import { serializeChannel, serializeRole } from './serialize.js';
 import { extraOwnerCommand, trustComponents, whitelistCommand } from './trust-command.js';
@@ -28,7 +29,13 @@ export const antinukeModule: BotModule = {
     backupCommand,
     incidentCommand,
   ],
-  components: [...antinukePanelComponents, ...trustComponents, ...backupComponents, ...incidentComponents],
+  components: [
+    ...antinukePanelComponents,
+    ...trustComponents,
+    ...backupComponents,
+    ...memberBackupComponents,
+    ...incidentComponents,
+  ],
   events: [
     defineEvent({
       event: 'guildAuditLogEntryCreate',

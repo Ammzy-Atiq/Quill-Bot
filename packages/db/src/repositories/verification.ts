@@ -5,6 +5,7 @@ import {
   fingerprints,
   guildBans,
   guildSettings,
+  guilds,
   guildVerifications,
   identityLinks,
   oauthGrants,
@@ -411,7 +412,54 @@ export async function getVerifiedIdentity(
   return db.query.verifiedIdentities.findFirst({ where: eq(verifiedIdentities.userId, userId) });
 }
 
-// ── data deletion ────────────────────────────────────────────────────────────
+// ── data access & deletion ───────────────────────────────────────────────────
+
+export interface UserDataSummary {
+  identity: VerifiedIdentityRow | null;
+  servers: Array<{
+    guildId: string;
+    name: string | null;
+    status: GuildVerificationStatus;
+    method: VerificationMethod;
+  }>;
+  fingerprints: number;
+  identityLinks: number;
+  oauth: { scopes: string[]; createdAt: Date; revoked: boolean } | null;
+}
+
+/** What QUILL stores about a user (shown to the user by `/data view` and the website). */
+export async function userDataSummary(db: Database, userId: string): Promise<UserDataSummary> {
+  const [identity, servers, [prints], [links], grant] = await Promise.all([
+    getVerifiedIdentity(db, userId),
+    db
+      .select({
+        guildId: guildVerifications.guildId,
+        name: guilds.name,
+        status: guildVerifications.status,
+        method: guildVerifications.method,
+      })
+      .from(guildVerifications)
+      .leftJoin(guilds, eq(guilds.id, guildVerifications.guildId))
+      .where(eq(guildVerifications.userId, userId))
+      .orderBy(desc(guildVerifications.updatedAt))
+      .limit(50),
+    db.select({ n: sql<number>`count(*)::int` }).from(fingerprints).where(eq(fingerprints.userId, userId)),
+    db
+      .select({ n: sql<number>`count(*)::int` })
+      .from(identityLinks)
+      .where(or(eq(identityLinks.userA, userId), eq(identityLinks.userB, userId))),
+    getOAuthGrant(db, userId),
+  ]);
+  return {
+    identity: identity ?? null,
+    servers,
+    fingerprints: prints?.n ?? 0,
+    identityLinks: links?.n ?? 0,
+    oauth: grant
+      ? { scopes: grant.scopes, createdAt: grant.createdAt, revoked: grant.revokedAt !== null }
+      : null,
+  };
+}
 
 export interface DeletionCounts {
   fingerprints: number;

@@ -44,7 +44,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ planned. Owners: **bot-agent** (this
 | Anti-Nuke + Anti-Raid services (`apps/bot`) | ✅ | bot-agent | audit-log mapping, punish, revert (incl. retroactive), live incident cards, emergency mode, snapshots + restore, raid mode |
 | Anti-Nuke commands + events (`/antinuke /whitelist /extraowner /emergency /backup /antiraid /incident`) | ✅ | bot-agent | panel, audit, red-team simulate, whitelist panel, confirmations, live incident buttons, snapshot restore with progress |
 | Shared verification repository (`verificationRepo` in `packages/db`) | ✅ | bot-agent | sessions, grants, fingerprints, alt graph, standing, network bans, statuses, deletion — API in `apps/website/AGENTS.md` §6 |
-| Verification (bot side), SSO, evasion, member backup job | ⏳ | bot-agent | Phase 5 |
+| Verification (bot side), SSO, evasion, member backup job | ✅ | bot-agent | `/verification` `/data`, Verify panel (website link / one-click / SSO), verdict + review subscribers, review cards, kick-unverified timer, `/backup server|members`, worker member pull with token refresh |
 | Moderation commands, `/messages`, native AutoMod sync | ⏳ | bot-agent | Phase 6 |
 | Website (landing, verify flow, OAuth, fingerprint, dashboard) | ⏳ ready to start | website-agent | Spec: `apps/website/AGENTS.md` — begin with §0 *Start here* |
 
@@ -125,10 +125,13 @@ that runs them (tsx, Vitest, tsup, Next.js `transpilePackages`) compiles them on
    incident (opened on punishment / high threat) with a live log card → punishment once per burst
    → revert queue (the event, and on the first punishment every earlier action of that actor in
    the window) → auto emergency mode at the configured threat level.
-3. **Verification:** member presses *Verify* → bot sends a signed link
-   (`signVerificationToken`) → website: consent → captcha → fingerprint → Discord OAuth →
-   `core` evasion matcher → DB rows → Redis `quill:verification:completed` → the shard owning the
-   guild applies roles / review / block.
+3. **Verification:** member presses *Verify* on the panel → whitelisted: verified at once ·
+   one-click mode or a fresh QUILL identity (SSO): the bot evaluates stored links itself
+   (`evaluateVerification`) · otherwise a personal signed link (`signVerificationToken`, 15 min) →
+   website: consent → captcha → fingerprint → Discord OAuth → `core` evasion matcher → DB rows →
+   Redis `quill:verification:completed` → the shard owning the guild gives the role, posts a review
+   card (flag: Approve / Deny / Ban) or applies the block action. Rejoining verified members and SSO
+   members are re-checked on join; unverified members can be kicked after N minutes.
 4. **Config:** stored **sparse** in `guild_settings.config` (JSONB), expanded with defaults by
    `parseGuildConfig`. Any writer bumps `version` and publishes `quill:config:invalidate`; every
    shard drops its cache.
@@ -318,6 +321,7 @@ this section in the same change.**
 | `trust_entries` writes | bot + website | whitelist = user + action keys; extra owners are **owner-only**, max `antinuke.maxExtraOwners`, never bots; publish `quill:trust:invalidate` after every change |
 | Anti-Nuke / Anti-Raid data | bot → website (read-only) | `incidents.summary`, `security_events`, `snapshots.data`, `emergency_states`, raid-mode key — formats in §7 |
 | Dev verification links | bot tooling → website dev | `pnpm verify:link <guildId> <userId>` (same token as the bot's Verify button) |
+| `QUEUES.memberPull` job | bot → worker | `MemberPullJob` `{ jobId, sourceGuildId, targetGuildId, requestedBy }`; progress in `member_pull_jobs` |
 | Tables written by the website | website | `verification_sessions`, `guild_verifications`, `verified_identities`, `fingerprints`, `identity_links`, `oauth_grants` |
 | Tables written by the bot | bot | everything else; the website may **read** them and may write `guild_settings` (dashboard) following §6 Config rules |
 | Commands manifest | bot → website | `apps/bot/commands.manifest.json` (`pnpm commands:manifest`) |
@@ -372,6 +376,10 @@ pnpm build && node apps/bot/dist/index.js   # production (sharded)
 docker compose up -d --build      # full stack in Docker
 ```
 
+**Worker jobs:** daily retention cleanup and member pulls (`/backup members pull`) — the worker
+needs `DISCORD_CLIENT_SECRET` to refresh members' OAuth tokens (the bot uses it for `/data delete`
+token revocation too).
+
 **Hosting:** any Node 22 host + any Postgres + any Redis. E.g. VPS with docker-compose; or
 Railway/Render/Fly for the bot & worker + Neon/Supabase (Postgres, add `?sslmode=require`) +
 Upstash/Railway (Redis). Run **one** `node dist/index.js` (spawns shards) and **≥1**
@@ -387,6 +395,20 @@ overwrite); put the QUILL role at the top of the role list; add the website's OA
 ---
 
 ## 11. Changelog
+
+- **Phase 5 — Verification (bot side)** (bot-agent): `VerificationService` (`app.verification`):
+  Verify button (whitelist → instant, one-click mode and SSO evaluated by the bot, otherwise a
+  personal signed website link), subscribers for `quill:verification:completed` (pass → roles,
+  flag → review card with Approve / Deny / Ban, block → configured ban/kick, all logged) and
+  `quill:verification:review` (dashboard decisions update the same card), SSO + rejoin checks on
+  join, unverified role, kick-unverified timer (Redis sorted set, per-shard sweep). Commands:
+  `/verification` (setup with role safety checks, panel, settings, status with linked accounts,
+  approve, deny, whitelist, disable, view) and `/data` (view, delete — revokes the Discord grant,
+  deletes verification data, publishes `quill:identity:revoked`). Member backups: `/backup server
+  add|remove|list` (owner of both servers) and `/backup members pull|status` → BullMQ job →
+  worker re-adds consenting members with refreshed `guilds.join` tokens and DMs the result.
+  `verificationRepo.userDataSummary`; store scheduling (`scheduleAdd/Due/Remove`); `followUp` UI
+  helper. Tests: verification flow and member pull against Postgres, UI limits. Manifest: 19 commands.
 
 - **`verificationRepo`** (bot-agent): shared verification repository in `packages/db` for the
   website flow and the bot's Phase 5 — single-use sessions, encrypted OAuth grants, hashed

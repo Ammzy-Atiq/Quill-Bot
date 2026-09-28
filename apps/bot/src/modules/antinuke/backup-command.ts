@@ -8,6 +8,7 @@ import { Card } from '../../ui/card.js';
 import { E } from '../../ui/emojis.js';
 import { confirmCard, infoCard, successCard } from '../../ui/presets.js';
 import { reply, update } from '../../ui/respond.js';
+import { handleMemberBackup, membersGroup, serverGroup } from './member-backup.js';
 import type { GuildSnapshotData } from './serialize.js';
 import type { RestoreReport } from './snapshots.js';
 
@@ -60,6 +61,7 @@ function restoreResultCard(id: number, mode: string, report: RestoreReport, by: 
 export const backupCommand: SlashCommand = {
   module: 'backup',
   permission: 'extra_owner',
+  subcommandPermissions: { 'server add': 'owner', 'server remove': 'owner', 'members pull': 'owner' },
   data: new SlashCommandBuilder()
     .setName('backup')
     .setDescription('Server snapshots: roles, channels, permissions and settings — restore after a nuke.')
@@ -105,7 +107,9 @@ export const backupCommand: SlashCommand = {
         .addIntegerOption((o) =>
           o.setName('id').setDescription('Snapshot').setRequired(true).setAutocomplete(true),
         ),
-    ),
+    )
+    .addSubcommandGroup(serverGroup)
+    .addSubcommandGroup(membersGroup),
   async autocomplete({ app, interaction, guild }) {
     const config = await app.configs.get(guild.id);
     if (!(await hasLevel(app, interaction.member, config, 'extra_owner'))) return interaction.respond([]);
@@ -122,8 +126,14 @@ export const backupCommand: SlashCommand = {
       .filter((c) => !query || c.name.toLowerCase().includes(query));
     return interaction.respond(choices.slice(0, 25));
   },
-  async execute({ app, interaction, guild }) {
+  async execute(ctx) {
+    const { app, interaction, guild } = ctx;
     const sub = interaction.options.getSubcommand();
+    const group = interaction.options.getSubcommandGroup(false);
+    if (group) {
+      await handleMemberBackup(ctx, group, sub);
+      return;
+    }
     const userId = interaction.user.id;
 
     if (sub === 'create') {

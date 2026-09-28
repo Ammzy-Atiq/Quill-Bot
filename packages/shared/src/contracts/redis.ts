@@ -76,6 +76,16 @@ export const VERIFICATION_REASON_CODES = {
   MANUAL_BLOCK: 'manual_block',
 } as const;
 
+/** Job payload on `QUEUES.memberPull` (bot → worker): re-add consenting members to a backup server. */
+export const MemberPullJob = z.object({
+  /** `member_pull_jobs.id` (progress + result live there). */
+  jobId: z.number().int(),
+  sourceGuildId: z.string(),
+  targetGuildId: z.string(),
+  requestedBy: z.string(),
+});
+export type MemberPullJob = z.infer<typeof MemberPullJob>;
+
 /** BullMQ queue names (worker process). */
 export const QUEUES = {
   restore: 'quill-restore',
@@ -98,4 +108,10 @@ export const redisKeys = {
   aiMinute: (guildId: string) => `quill:ai:min:${guildId}`,
   verifySession: (sessionId: string) => `quill:verify:${sessionId}`,
   deletedObject: (guildId: string, objectId: string) => `quill:deleted:${guildId}:${objectId}`,
+  /** Sorted set of members to kick if still unverified (score = deadline ms). */
+  verifyKickQueue: (guildId: string) => `quill:verify:kick:${guildId}`,
+  /** Where the review card for a flagged member lives ({ channelId, messageId }). */
+  verifyReviewCard: (guildId: string, userId: string) => `quill:verify:review:${guildId}:${userId}`,
+  /** Dedupe for `quill:verification:completed` messages (every shard receives them). */
+  verifyHandled: (sessionId: string) => `quill:verify:handled:${sessionId}`,
 } as const;

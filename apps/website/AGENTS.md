@@ -53,9 +53,11 @@
 | Shared **verification repository** (`verificationRepo`, API in §6) | ✅ with integration tests | `@quill/db` |
 | Commands manifest for `/commands` | ✅ regenerated every bot phase | `apps/bot/commands.manifest.json` |
 | Bot reacts to `quill:config:invalidate` / `quill:trust:invalidate` | ✅ | dashboard edits apply instantly |
-| Bot "Verify" button that sends members to your site | ⏳ bot Phase 5 | meanwhile: `pnpm verify:link <guildId> <userId>` (§0.4) |
-| Bot applies `quill:verification:completed` (roles / review card / block) | ⏳ bot Phase 5 | meanwhile watch the channel (§0.4) — build against the contract |
-| Bot applies `quill:verification:review` decisions | ⏳ bot Phase 5 | same |
+| Bot "Verify" button that sends members to your site | ✅ | `/verification setup` + `/verification panel` (or `pnpm verify:link <guildId> <userId>`) |
+| Bot applies `quill:verification:completed` (roles / review card / block) | ✅ | pass → roles · flag → review card · block → ban/kick per config |
+| Bot applies `quill:verification:review` decisions | ✅ | updates the same review card in Discord |
+| SSO, rejoin checks, kick-unverified timer, `/data` in Discord | ✅ | the bot handles these without the website |
+| Member backups (`guilds.join`) | ✅ | reads your `oauth_grants` + `guild_verifications.backup_consent`; the worker refreshes tokens |
 | Anti-Nuke / Anti-Raid data (incidents, security events, snapshots, emergency state) | ✅ | formats in root `AGENTS.md` §7 |
 
 ### 0.3 Ownership & parallel-work rules
@@ -518,8 +520,7 @@ network prefix alone is weak evidence. Revoke the OAuth token at Discord **befor
 - [ ] `pnpm --filter @quill/website build` succeeds; `pnpm check` stays green.
 - [ ] Lighthouse ≥ 90 (performance, accessibility, best practices) on `/`.
 - [ ] Verification happy path works end-to-end against a test server: token → consent → captcha →
-      fingerprint → OAuth → pass → `quill:verification:completed` published (and, once bot
-      Phase 5 lands, the bot gives the role).
+      fingerprint → OAuth → pass → `quill:verification:completed` published → the bot gives the role.
 - [ ] Alt test: verify account A, ban A in the server, verify account B from the same browser →
       verdict `flag` (or `block` when `onMatch='block'`) with reason `alt_of_banned`.
 - [ ] Reused/expired token and wrong-account flows show friendly errors.

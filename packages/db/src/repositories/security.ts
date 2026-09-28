@@ -1,13 +1,22 @@
 import type { ThreatLevel } from '@quill/shared';
 import { and, desc, eq, lt, notInArray, sql } from 'drizzle-orm';
 import type { Database } from '../client.js';
-import { emergencyStates, incidents, securityEvents, snapshots } from '../schema/index.js';
+import {
+  backupServers,
+  emergencyStates,
+  incidents,
+  memberPullJobs,
+  securityEvents,
+  snapshots,
+} from '../schema/index.js';
 import { nextCounter } from './guilds.js';
 
 export type IncidentRow = typeof incidents.$inferSelect;
 export type SecurityEventRow = typeof securityEvents.$inferSelect;
 export type SnapshotRow = typeof snapshots.$inferSelect;
 export type EmergencyRow = typeof emergencyStates.$inferSelect;
+export type BackupServerRow = typeof backupServers.$inferSelect;
+export type PullJobRow = typeof memberPullJobs.$inferSelect;
 
 // ── incidents ────────────────────────────────────────────────────────────────
 export async function openIncident(
@@ -219,4 +228,90 @@ export async function saveEmergency(
     .insert(emergencyStates)
     .values(input)
     .onConflictDoUpdate({ target: emergencyStates.guildId, set: input });
+}
+
+// ── member backup (guilds.join) ──────────────────────────────────────────────
+
+/** Registers `targetGuildId` as a backup server of `sourceGuildId` (idempotent). */
+export async function addBackupServer(
+  db: Database,
+  input: { sourceGuildId: string; targetGuildId: string; ownerId: string },
+): Promise<void> {
+  await db
+    .insert(backupServers)
+    .values(input)
+    .onConflictDoUpdate({
+      target: [backupServers.sourceGuildId, backupServers.targetGuildId],
+      set: { ownerId: input.ownerId },
+    });
+}
+
+export async function removeBackupServer(
+  db: Database,
+  sourceGuildId: string,
+  targetGuildId: string,
+): Promise<boolean> {
+  const rows = await db
+    .delete(backupServers)
+    .where(
+      and(eq(backupServers.sourceGuildId, sourceGuildId), eq(backupServers.targetGuildId, targetGuildId)),
+    )
+    .returning({ id: backupServers.id });
+  return rows.length > 0;
+}
+
+/** Backup servers of a source guild. */
+export async function listBackupServers(db: Database, sourceGuildId: string): Promise<BackupServerRow[]> {
+  return db.select().from(backupServers).where(eq(backupServers.sourceGuildId, sourceGuildId));
+}
+
+/** Source guilds that registered `targetGuildId` as their backup server. */
+export async function listBackupSources(db: Database, targetGuildId: string): Promise<BackupServerRow[]> {
+  return db.select().from(backupServers).where(eq(backupServers.targetGuildId, targetGuildId));
+}
+
+export async function getBackupLink(
+  db: Database,
+  sourceGuildId: string,
+  targetGuildId: string,
+): Promise<BackupServerRow | undefined> {
+  return db.query.backupServers.findFirst({
+    where: and(
+      eq(backupServers.sourceGuildId, sourceGuildId),
+      eq(backupServers.targetGuildId, targetGuildId),
+    ),
+  });
+}
+
+export async function createPullJob(
+  db: Database,
+  input: { sourceGuildId: string; targetGuildId: string; requestedBy: string },
+): Promise<PullJobRow> {
+  const [row] = await db.insert(memberPullJobs).values(input).returning();
+  return row!;
+}
+
+export async function updatePullJob(
+  db: Database,
+  id: number,
+  patch: Partial<Pick<PullJobRow, 'status' | 'total' | 'added' | 'skipped' | 'failed' | 'error'>>,
+): Promise<void> {
+  await db
+    .update(memberPullJobs)
+    .set({ ...patch, updatedAt: new Date() })
+    .where(eq(memberPullJobs.id, id));
+}
+
+export async function getPullJob(db: Database, id: number): Promise<PullJobRow | undefined> {
+  return db.query.memberPullJobs.findFirst({ where: eq(memberPullJobs.id, id) });
+}
+
+/** Recent pull jobs into a backup server (newest first). */
+export async function listPullJobs(db: Database, targetGuildId: string, limit = 10): Promise<PullJobRow[]> {
+  return db
+    .select()
+    .from(memberPullJobs)
+    .where(eq(memberPullJobs.targetGuildId, targetGuildId))
+    .orderBy(desc(memberPullJobs.createdAt))
+    .limit(limit);
 }

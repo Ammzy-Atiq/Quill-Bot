@@ -23,6 +23,11 @@ export interface KeyValueStore {
   /** Push to a capped list (newest last) with a TTL. */
   pushCapped(key: string, value: string, maxLength: number, ttlSeconds: number): Promise<void>;
   list(key: string): Promise<string[]>;
+  /** Scheduling (sorted set): add or move `member` to fire at `atMs`. */
+  scheduleAdd(key: string, member: string, atMs: number): Promise<void>;
+  /** Members due at or before `nowMs`, oldest first (they stay until `scheduleRemove`). */
+  scheduleDue(key: string, nowMs: number, limit: number): Promise<string[]>;
+  scheduleRemove(key: string, member: string): Promise<void>;
   publish(channel: string, message: unknown): Promise<void>;
   subscribe(channel: string, handler: (message: unknown) => void): Promise<void>;
   close(): Promise<void>;
@@ -140,6 +145,18 @@ export class RedisStore implements KeyValueStore {
     return this.redis.lrange(key, 0, -1);
   }
 
+  async scheduleAdd(key: string, member: string, atMs: number) {
+    await this.redis.zadd(key, atMs, member);
+  }
+
+  async scheduleDue(key: string, nowMs: number, limit: number) {
+    return this.redis.zrangebyscore(key, '-inf', nowMs, 'LIMIT', 0, limit);
+  }
+
+  async scheduleRemove(key: string, member: string) {
+    await this.redis.zrem(key, member);
+  }
+
   async publish(channel: string, message: unknown) {
     await this.redis.publish(channel, JSON.stringify(message));
   }
@@ -169,6 +186,7 @@ export class MemoryStore implements KeyValueStore {
     { entries: Array<{ member: string; at: number }>; expires: number }
   >();
   private readonly lists = new Map<string, { items: string[]; expires: number }>();
+  private readonly schedules = new Map<string, Map<string, number>>();
   private readonly handlers = new Map<string, Set<(message: unknown) => void>>();
 
   private alive<T extends { expires: number | null }>(entry: T | undefined): T | undefined {
@@ -236,6 +254,26 @@ export class MemoryStore implements KeyValueStore {
     return [...existing.items];
   }
 
+  async scheduleAdd(key: string, member: string, atMs: number) {
+    const set = this.schedules.get(key) ?? new Map<string, number>();
+    set.set(member, atMs);
+    this.schedules.set(key, set);
+  }
+
+  async scheduleDue(key: string, nowMs: number, limit: number) {
+    const set = this.schedules.get(key);
+    if (!set) return [];
+    return [...set.entries()]
+      .filter(([, at]) => at <= nowMs)
+      .sort((a, b) => a[1] - b[1])
+      .slice(0, limit)
+      .map(([member]) => member);
+  }
+
+  async scheduleRemove(key: string, member: string) {
+    this.schedules.get(key)?.delete(member);
+  }
+
   async publish(channel: string, message: unknown) {
     const payload = JSON.parse(JSON.stringify(message)) as unknown;
     for (const handler of this.handlers.get(channel) ?? []) queueMicrotask(() => handler(payload));
@@ -254,5 +292,6 @@ export class MemoryStore implements KeyValueStore {
     this.values.clear();
     this.windows.clear();
     this.lists.clear();
+    this.schedules.clear();
   }
 }

@@ -7,6 +7,7 @@ import type { Env } from './env.js';
 import { Registry } from './framework/registry.js';
 import { routeInteraction } from './framework/router.js';
 import type { BotModule } from './framework/types.js';
+import { JobQueues } from './lib/jobs.js';
 import type { KeyValueStore } from './lib/store.js';
 import type { Logger } from './logger.js';
 import { EmergencyService } from './modules/antinuke/emergency.js';
@@ -16,6 +17,7 @@ import { AntiRaidService } from './modules/antiraid/service.js';
 import { AiService } from './modules/automod/ai/service.js';
 import { AutomodData } from './modules/automod/data.js';
 import { AutomodService } from './modules/automod/service.js';
+import { VerificationService } from './modules/verification/service.js';
 import { CaseService } from './services/cases.js';
 import { GuildConfigService } from './services/guild-config.js';
 import { LogService } from './services/logs.js';
@@ -50,6 +52,8 @@ export class App {
   readonly emergency: EmergencyService;
   readonly antinuke: AntiNukeService;
   readonly antiraid: AntiRaidService;
+  readonly verification: VerificationService;
+  readonly jobs: JobQueues;
 
   constructor(
     readonly env: Env,
@@ -74,6 +78,8 @@ export class App {
     this.emergency = new EmergencyService(this);
     this.antinuke = new AntiNukeService(this);
     this.antiraid = new AntiRaidService(this);
+    this.verification = new VerificationService(this);
+    this.jobs = new JobQueues(env.REDIS_URL);
   }
 
   /** Thumbnail used on QUILL cards: BRAND_LOGO_URL, else the bot avatar. */
@@ -93,6 +99,7 @@ export class App {
     await this.configs.init();
     await this.trust.init();
     await this.automodData.init();
+    await this.verification.init();
     this.antinuke.start();
     for (const module of this.registry.modules) await module.init?.(this);
 
@@ -120,7 +127,9 @@ export class App {
     this.logger.info('shutting down');
     this.snapshots.stop();
     this.antinuke.stop();
+    this.verification.stop();
     await this.client.destroy();
+    await this.jobs.close();
     await this.store.close();
   }
 }
