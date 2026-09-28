@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-28T10:59:14.036Z",
+  "generatedAt": "2026-09-28T11:08:19.396Z",
   "commands": [
     {
       "module": "general",
@@ -39,6 +39,189 @@
       "options": [],
       "name": "setup",
       "description": "Open the QUILL GUARD setup panel.",
+      "default_member_permissions": "32",
+      "type": 1
+    },
+    {
+      "module": "general",
+      "permission": "manager",
+      "permissionLabel": "Manage Server",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "type": 1,
+          "name": "list",
+          "description": "All templates and whether they are customised.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "edit",
+          "description": "Edit a template.",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "AutoMod — DM to the member",
+                  "value": "automod_dm"
+                },
+                {
+                  "name": "AutoMod — notice in the channel",
+                  "value": "automod_channel"
+                },
+                {
+                  "name": "Risk Engine — DM on escalation",
+                  "value": "risk_action_dm"
+                },
+                {
+                  "name": "Verification — panel",
+                  "value": "verification_panel"
+                },
+                {
+                  "name": "Verification — success",
+                  "value": "verification_success"
+                },
+                {
+                  "name": "Verification — under review",
+                  "value": "verification_flagged"
+                },
+                {
+                  "name": "Verification — denied",
+                  "value": "verification_blocked"
+                },
+                {
+                  "name": "Emergency mode notice",
+                  "value": "emergency_notice"
+                },
+                {
+                  "name": "Raid mode notice",
+                  "value": "raid_notice"
+                },
+                {
+                  "name": "Moderation — DM to the member",
+                  "value": "moderation_dm"
+                }
+              ],
+              "name": "template",
+              "description": "Template",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "preview",
+          "description": "Preview a template with example values.",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "AutoMod — DM to the member",
+                  "value": "automod_dm"
+                },
+                {
+                  "name": "AutoMod — notice in the channel",
+                  "value": "automod_channel"
+                },
+                {
+                  "name": "Risk Engine — DM on escalation",
+                  "value": "risk_action_dm"
+                },
+                {
+                  "name": "Verification — panel",
+                  "value": "verification_panel"
+                },
+                {
+                  "name": "Verification — success",
+                  "value": "verification_success"
+                },
+                {
+                  "name": "Verification — under review",
+                  "value": "verification_flagged"
+                },
+                {
+                  "name": "Verification — denied",
+                  "value": "verification_blocked"
+                },
+                {
+                  "name": "Emergency mode notice",
+                  "value": "emergency_notice"
+                },
+                {
+                  "name": "Raid mode notice",
+                  "value": "raid_notice"
+                },
+                {
+                  "name": "Moderation — DM to the member",
+                  "value": "moderation_dm"
+                }
+              ],
+              "name": "template",
+              "description": "Template",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "reset",
+          "description": "Reset a template to the QUILL default.",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "AutoMod — DM to the member",
+                  "value": "automod_dm"
+                },
+                {
+                  "name": "AutoMod — notice in the channel",
+                  "value": "automod_channel"
+                },
+                {
+                  "name": "Risk Engine — DM on escalation",
+                  "value": "risk_action_dm"
+                },
+                {
+                  "name": "Verification — panel",
+                  "value": "verification_panel"
+                },
+                {
+                  "name": "Verification — success",
+                  "value": "verification_success"
+                },
+                {
+                  "name": "Verification — under review",
+                  "value": "verification_flagged"
+                },
+                {
+                  "name": "Verification — denied",
+                  "value": "verification_blocked"
+                },
+                {
+                  "name": "Emergency mode notice",
+                  "value": "emergency_notice"
+                },
+                {
+                  "name": "Raid mode notice",
+                  "value": "raid_notice"
+                },
+                {
+                  "name": "Moderation — DM to the member",
+                  "value": "moderation_dm"
+                }
+              ],
+              "name": "template",
+              "description": "Template",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "name": "messages",
+      "description": "Customise the messages QUILL sends (DMs, notices, verification panel).",
       "default_member_permissions": "32",
       "type": 1
     },
@@ -572,6 +755,41 @@
               "description": "Flag excessive caps",
               "required": false,
               "type": 5
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "native",
+          "description": "Mirror the worst terms into Discord's AutoMod (blocks before posting).",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Sync now",
+                  "value": "sync"
+                },
+                {
+                  "name": "Status",
+                  "value": "status"
+                },
+                {
+                  "name": "Remove",
+                  "value": "remove"
+                }
+              ],
+              "name": "action",
+              "description": "What to do",
+              "required": true
+            },
+            {
+              "max_value": 5,
+              "min_value": 1,
+              "type": 4,
+              "name": "min_severity",
+              "description": "Mirror terms at or above (default 4)",
+              "required": false
             }
           ]
         },
@@ -2827,6 +3045,310 @@
       ],
       "name": "data",
       "description": "Your QUILL GUARD data: see or delete what verification stored about you.",
+      "type": 1
+    },
+    {
+      "module": "moderation",
+      "permission": "moderator",
+      "permissionLabel": "Moderator",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "name": "user",
+          "description": "Member",
+          "required": true,
+          "type": 6
+        },
+        {
+          "type": 3,
+          "name": "reason",
+          "description": "Reason",
+          "required": true,
+          "max_length": 500
+        },
+        {
+          "max_value": 200,
+          "min_value": 0,
+          "type": 4,
+          "name": "points",
+          "description": "Risk points to add (default 0)",
+          "required": false
+        }
+      ],
+      "name": "warn",
+      "description": "Warn a member (recorded as a case, expires after the configured days).",
+      "default_member_permissions": "1099511627776",
+      "type": 1
+    },
+    {
+      "module": "moderation",
+      "permission": "moderator",
+      "permissionLabel": "Moderator",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "name": "user",
+          "description": "Member",
+          "required": true,
+          "type": 6
+        },
+        {
+          "type": 3,
+          "name": "duration",
+          "description": "How long, e.g. 10m, 2h, 7d (max 28d)",
+          "required": true,
+          "max_length": 20
+        },
+        {
+          "type": 3,
+          "name": "reason",
+          "description": "Reason",
+          "required": false,
+          "max_length": 500
+        }
+      ],
+      "name": "timeout",
+      "description": "Time a member out.",
+      "default_member_permissions": "1099511627776",
+      "type": 1
+    },
+    {
+      "module": "moderation",
+      "permission": "moderator",
+      "permissionLabel": "Moderator",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "name": "user",
+          "description": "Member",
+          "required": true,
+          "type": 6
+        },
+        {
+          "type": 3,
+          "name": "reason",
+          "description": "Reason",
+          "required": false,
+          "max_length": 500
+        }
+      ],
+      "name": "untimeout",
+      "description": "Remove a member's timeout.",
+      "default_member_permissions": "1099511627776",
+      "type": 1
+    },
+    {
+      "module": "moderation",
+      "permission": "moderator",
+      "permissionLabel": "Moderator",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "name": "user",
+          "description": "Member",
+          "required": true,
+          "type": 6
+        },
+        {
+          "type": 3,
+          "name": "reason",
+          "description": "Reason",
+          "required": false,
+          "max_length": 500
+        }
+      ],
+      "name": "kick",
+      "description": "Kick a member.",
+      "default_member_permissions": "2",
+      "type": 1
+    },
+    {
+      "module": "moderation",
+      "permission": "moderator",
+      "permissionLabel": "Moderator",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "name": "user",
+          "description": "Member",
+          "required": true,
+          "type": 6
+        },
+        {
+          "type": 3,
+          "name": "reason",
+          "description": "Reason",
+          "required": false,
+          "max_length": 500
+        }
+      ],
+      "name": "softban",
+      "description": "Kick a member and delete their last day of messages.",
+      "default_member_permissions": "4",
+      "type": 1
+    },
+    {
+      "module": "moderation",
+      "permission": "moderator",
+      "permissionLabel": "Moderator",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "name": "user",
+          "description": "Member",
+          "required": true,
+          "type": 6
+        },
+        {
+          "type": 3,
+          "name": "reason",
+          "description": "Reason",
+          "required": false,
+          "max_length": 500
+        },
+        {
+          "type": 4,
+          "choices": [
+            {
+              "name": "Don't delete",
+              "value": 0
+            },
+            {
+              "name": "Last hour",
+              "value": 3600
+            },
+            {
+              "name": "Last 24 hours",
+              "value": 86400
+            },
+            {
+              "name": "Last 7 days",
+              "value": 604800
+            }
+          ],
+          "name": "delete_messages",
+          "description": "Delete their recent messages",
+          "required": false
+        }
+      ],
+      "name": "ban",
+      "description": "Ban a user (works for people who already left).",
+      "default_member_permissions": "4",
+      "type": 1
+    },
+    {
+      "module": "moderation",
+      "permission": "moderator",
+      "permissionLabel": "Moderator",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "type": 3,
+          "name": "user_id",
+          "description": "User ID",
+          "required": true,
+          "max_length": 20
+        },
+        {
+          "type": 3,
+          "name": "reason",
+          "description": "Reason",
+          "required": false,
+          "max_length": 500
+        }
+      ],
+      "name": "unban",
+      "description": "Unban a user by ID.",
+      "default_member_permissions": "4",
+      "type": 1
+    },
+    {
+      "module": "moderation",
+      "permission": "moderator",
+      "permissionLabel": "Moderator",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "name": "user",
+          "description": "Member",
+          "required": true,
+          "type": 6
+        },
+        {
+          "type": 3,
+          "name": "reason",
+          "description": "Reason",
+          "required": false,
+          "max_length": 500
+        }
+      ],
+      "name": "quarantine",
+      "description": "Take every role away and lock the member into the quarantine role.",
+      "default_member_permissions": "268435456",
+      "type": 1
+    },
+    {
+      "module": "moderation",
+      "permission": "moderator",
+      "permissionLabel": "Moderator",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "name": "user",
+          "description": "Member",
+          "required": true,
+          "type": 6
+        },
+        {
+          "type": 3,
+          "name": "reason",
+          "description": "Reason",
+          "required": false,
+          "max_length": 500
+        }
+      ],
+      "name": "unquarantine",
+      "description": "Give a quarantined member their roles back.",
+      "default_member_permissions": "268435456",
+      "type": 1
+    },
+    {
+      "module": "moderation",
+      "permission": "moderator",
+      "permissionLabel": "Moderator",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "max_value": 100,
+          "min_value": 1,
+          "type": 4,
+          "name": "amount",
+          "description": "How many",
+          "required": true
+        },
+        {
+          "name": "user",
+          "description": "Only messages from this user",
+          "required": false,
+          "type": 6
+        },
+        {
+          "type": 3,
+          "name": "contains",
+          "description": "Only messages containing this text",
+          "required": false,
+          "max_length": 100
+        },
+        {
+          "name": "bots",
+          "description": "Only messages from bots",
+          "required": false,
+          "type": 5
+        }
+      ],
+      "name": "purge",
+      "description": "Bulk-delete recent messages in this channel (max 100, younger than 14 days).",
+      "default_member_permissions": "8192",
       "type": 1
     }
   ]

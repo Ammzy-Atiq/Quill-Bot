@@ -6,6 +6,7 @@ import { casesModule } from './cases/index.js';
 import { coreModule } from './core/index.js';
 import { generalModule } from './general/index.js';
 import { loggingModule } from './logging/index.js';
+import { moderationModule } from './moderation/index.js';
 import { banMirrorEvents } from './moderation/quick-actions.js';
 import { verificationModule } from './verification/index.js';
 
@@ -22,4 +23,5 @@ export const MODULES: BotModule[] = [
   antinukeModule,
   antiraidModule,
   verificationModule,
+  moderationModule,
 ];

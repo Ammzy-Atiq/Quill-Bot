@@ -45,7 +45,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ planned. Owners: **bot-agent** (this
 | Anti-Nuke commands + events (`/antinuke /whitelist /extraowner /emergency /backup /antiraid /incident`) | ✅ | bot-agent | panel, audit, red-team simulate, whitelist panel, confirmations, live incident buttons, snapshot restore with progress |
 | Shared verification repository (`verificationRepo` in `packages/db`) | ✅ | bot-agent | sessions, grants, fingerprints, alt graph, standing, network bans, statuses, deletion — API in `apps/website/AGENTS.md` §6 |
 | Verification (bot side), SSO, evasion, member backup job | ✅ | bot-agent | `/verification` `/data`, Verify panel (website link / one-click / SSO), verdict + review subscribers, review cards, kick-unverified timer, `/backup server|members`, worker member pull with token refresh |
-| Moderation commands, `/messages`, native AutoMod sync | ⏳ | bot-agent | Phase 6 |
+| Moderation commands, `/messages`, native AutoMod sync | ✅ | bot-agent | `/warn /timeout /untimeout /kick /softban /ban /unban /quarantine /unquarantine /purge`, template editor (modal + preview), `/automod native` |
 | Website (landing, verify flow, OAuth, fingerprint, dashboard) | ⏳ ready to start | website-agent | Spec: `apps/website/AGENTS.md` — begin with §0 *Start here* |
 
 ---
@@ -235,7 +235,10 @@ webhook_delete emoji_delete integration_create automod_rule_delete mention_every
 
 ### Message templates
 `{ title, body, footer, showThumbnail, imageUrl }` with variables `{user} {user.name} {user.id}
-{server} {server.id}` plus per-template ones (`TEMPLATE_VARIABLES`). Defaults: `DEFAULT_TEMPLATES`.
+{server} {server.id}` plus per-template ones (`TEMPLATE_VARIABLES`). Defaults: `DEFAULT_TEMPLATES`,
+editor names: `TEMPLATE_LABELS`. Keys: `automod_dm automod_channel risk_action_dm verification_panel
+verification_success verification_flagged verification_blocked emergency_notice raid_notice
+moderation_dm`. Stored only when different from the default (`messages.templates.<key>`).
 
 ### AutoMod pipeline (implemented)
 `messageCreate`/`messageUpdate` → exemptions (users, roles, channels/categories, Manage Messages
@@ -389,12 +392,29 @@ Upstash/Railway (Redis). Run **one** `node dist/index.js` (spawns shards) and **
 invite with the `bot` + `applications.commands` scopes and Administrator (anti-nuke must restore any
 overwrite); put the QUILL role at the top of the role list; add the website's OAuth redirect URI.
 
+### Known limitations (by design / Discord API)
+- Native AutoMod sync is manual: re-run `/automod native action:sync` after changing words
+  (Discord allows 1000 keywords per rule; raise `min_severity` to prioritise).
+- Recovery cannot restore deleted messages, kicked/pruned members (unless they consented to member
+  backups) or a stolen vanity URL. Re-created roles are given back to members QUILL has cached
+  (up to 2000 per server) or listed in the latest snapshot.
+- Snapshot restores run in the shard that owns the guild (they need the live cache).
+
 ### Open issues
 - _none yet_
 
 ---
 
 ## 11. Changelog
+
+- **Phase 6 — Moderation, templates, native AutoMod** (bot-agent): manual moderation commands with
+  invoker-permission and role-hierarchy checks, `moderation_dm` template, cases and log cards
+  (`/warn` can add risk points without firing the ladder; `/unquarantine` restores roles from the
+  quarantine case; `/purge` with user/text/bot filters); `/messages list|edit|preview|reset` (modal
+  with title/body/footer/image + logo toggle, overrides equal to the default are dropped,
+  `TEMPLATE_LABELS` in shared); `/automod native action:sync|status|remove` mirrors custom words +
+  high-severity built-ins into one Discord AutoMod keyword rule (`automod.native` config). README
+  first-steps + command overview. Tests: Phase 6 integration suite. Manifest: 30 commands.
 
 - **Phase 5 — Verification (bot side)** (bot-agent): `VerificationService` (`app.verification`):
   Verify button (whitelist → instant, one-click mode and SSO evaluated by the bot, otherwise a

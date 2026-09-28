@@ -20,6 +20,7 @@ import { successCard } from '../../ui/presets.js';
 import { reply } from '../../ui/respond.js';
 import { violationLines } from './cards.js';
 import { dHashUrl } from './image-hash.js';
+import { handleNative } from './native.js';
 import { automodPanel } from './panel.js';
 
 const detectorChoices = DETECTOR_KEYS.map((k) => ({ name: DETECTOR_LABELS[k], value: k }));
@@ -136,6 +137,29 @@ const data = new SlashCommandBuilder()
         o.setName('emojis').setDescription('Max emojis per message').setMinValue(3).setMaxValue(200),
       )
       .addBooleanOption((o) => o.setName('caps').setDescription('Flag excessive caps')),
+  )
+  .addSubcommand((s) =>
+    s
+      .setName('native')
+      .setDescription("Mirror the worst terms into Discord's AutoMod (blocks before posting).")
+      .addStringOption((o) =>
+        o
+          .setName('action')
+          .setDescription('What to do')
+          .setRequired(true)
+          .addChoices(
+            { name: 'Sync now', value: 'sync' },
+            { name: 'Status', value: 'status' },
+            { name: 'Remove', value: 'remove' },
+          ),
+      )
+      .addIntegerOption((o) =>
+        o
+          .setName('min_severity')
+          .setDescription('Mirror terms at or above (default 4)')
+          .setMinValue(1)
+          .setMaxValue(5),
+      ),
   )
   .addSubcommandGroup((g) =>
     g
@@ -422,6 +446,10 @@ export const automodCommand: SlashCommand = {
     const done = (title: string, body?: string) =>
       reply(interaction, successCard(title, body), { ephemeral: true });
 
+    if (!group && sub === 'native') {
+      await handleNative(ctx);
+      return;
+    }
     if (!group) {
       switch (sub) {
         case 'panel':

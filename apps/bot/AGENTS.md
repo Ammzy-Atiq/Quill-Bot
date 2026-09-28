@@ -18,6 +18,9 @@ accent colour, permission model, privacy) apply here.
 | `src/modules/automod/` | pipeline service, data (matchers, scam data), image hashes, panel/cards, `/automod /policy /ai /risk`, `ai/` providers (BYOK) |
 | `src/modules/antinuke/` | `mapping.ts` (audit entry → action), `service.ts` (`app.antinuke`: decisions, punish, incidents), `revert.ts` (`Reverter`), `emergency.ts` (`app.emergency`), `snapshots.ts` (`app.snapshots`), `serialize.ts` (snapshot format), `cards.ts` (incident card), `audit.ts` (hardening audit), `panel.ts`, commands: `antinuke-command.ts`, `trust-command.ts` (`/whitelist` `/extraowner`), `emergency-command.ts`, `backup-command.ts`, `incident-command.ts`; `index.ts` wires events (audit log, @everyone, delete caches, snapshot scheduler) |
 | `src/modules/antiraid/` | `service.ts` (`app.antiraid`: join filters, raid mode), `command.ts` (`/antiraid`, raid card button) |
+| `src/modules/moderation/` | `commands.ts` (`/warn /timeout /untimeout /kick /softban /ban /unban /quarantine /unquarantine /purge`), `quick-actions.ts` (log-card buttons, ban mirror) |
+| `src/modules/general/messages.ts` | `/messages` template editor (modal) |
+| `src/modules/automod/native.ts` | `/automod native` — Discord AutoMod keyword rule sync |
 | `src/modules/verification/` | `service.ts` (`app.verification`: Verify flow, website verdicts, reviews, SSO/rejoin, kick timer), `command.ts` (`/verification`, Verify + review buttons), `data-command.ts` (`/data`), `cards.ts` |
 | `src/modules/antinuke/member-backup.ts` | `/backup server …` and `/backup members …` (queues `QUEUES.memberPull`) |
 | `src/worker/` | `jobs.ts` (queue → handler), `retention.ts`, `member-pull.ts` (guilds.join re-adds with token refresh) |

@@ -69,6 +69,27 @@ export class RiskService {
       .catch((err: unknown) => this.app.logger.warn({ err }, 'risk persist failed'));
   }
 
+  /**
+   * Adds manual points (e.g. `/warn points:`) to the decayed score without running the ladder —
+   * the next AutoMod violation escalates from the new score.
+   */
+  async addPoints(guildId: string, userId: string, points: number): Promise<number> {
+    const config = await this.app.configs.get(guildId);
+    const now = Date.now();
+    const previous = await this.state(guildId, userId);
+    const base = previous
+      ? decayScore(previous.score, previous.updatedAt, now, config.risk.halfLifeHours)
+      : 0;
+    const state: RiskState = {
+      score: base + points,
+      updatedAt: now,
+      lastStepThreshold: previous?.lastStepThreshold ?? 0,
+      lastViolationAt: now,
+    };
+    await this.save(guildId, userId, state);
+    return Math.round(state.score * 10) / 10;
+  }
+
   async reset(guildId: string, userId: string): Promise<void> {
     await this.app.store.del(redisKeys.risk(guildId, userId));
     await riskRepo.deleteRisk(this.app.db, guildId, userId);

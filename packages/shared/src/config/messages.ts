@@ -27,8 +27,23 @@ export const TEMPLATE_KEYS = [
   'verification_blocked',
   'emergency_notice',
   'raid_notice',
+  'moderation_dm',
 ] as const;
 export type TemplateKey = (typeof TEMPLATE_KEYS)[number];
+
+/** Human names for the template editor (bot `/messages` and the website dashboard). */
+export const TEMPLATE_LABELS: Record<TemplateKey, string> = {
+  automod_dm: 'AutoMod — DM to the member',
+  automod_channel: 'AutoMod — notice in the channel',
+  risk_action_dm: 'Risk Engine — DM on escalation',
+  verification_panel: 'Verification — panel',
+  verification_success: 'Verification — success',
+  verification_flagged: 'Verification — under review',
+  verification_blocked: 'Verification — denied',
+  emergency_notice: 'Emergency mode notice',
+  raid_notice: 'Raid mode notice',
+  moderation_dm: 'Moderation — DM to the member',
+};
 
 /** Variables available in every template: {user} {user.name} {user.id} {server} {server.id}. */
 export const TEMPLATE_VARIABLES: Record<TemplateKey, string[]> = {
@@ -41,6 +56,7 @@ export const TEMPLATE_VARIABLES: Record<TemplateKey, string[]> = {
   verification_blocked: ['reason'],
   emergency_notice: ['reason'],
   raid_notice: ['duration'],
+  moderation_dm: ['action', 'reason', 'moderator'],
 };
 
 export const DEFAULT_TEMPLATES: Record<TemplateKey, MessageTemplate> = {
@@ -104,6 +120,13 @@ export const DEFAULT_TEMPLATES: Record<TemplateKey, MessageTemplate> = {
     title: 'Raid protection active',
     body: 'A raid was detected. New joins are restricted for **{duration}**.',
     footer: 'Protected by QUILL GUARD',
+    showThumbnail: true,
+    imageUrl: null,
+  },
+  moderation_dm: {
+    title: 'Moderation action in {server}',
+    body: 'You received **{action}** from the staff of **{server}**.\n**Reason:** {reason}',
+    footer: 'Contact the server staff if you believe this was a mistake.',
     showThumbnail: true,
     imageUrl: null,
   },

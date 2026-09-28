@@ -372,7 +372,11 @@ server limit (`PUT` returns error code 30001), verification disabled mid-flow, c
     `trust.removeTrustEntry(…, 'extra_owner')` (owner only, max `antinuke.maxExtraOwners`, never
     bots). After every change publish `REDIS_CHANNELS.trustInvalidate` `{ guildId, origin: 'website' }`.
   - **Anti-Raid, Verification** (role pickers, evasion policy, SSO, backup consent), **Logging**
-    (channel pickers per `LOG_CATEGORIES`), **Messages** (template editor with `DiscordPreview`).
+    (channel pickers per `LOG_CATEGORIES`), **Messages** (template editor with `DiscordPreview`;
+    names in `TEMPLATE_LABELS`, variables in `TEMPLATE_VARIABLES`; save only when different from
+    `DEFAULT_TEMPLATES`, otherwise remove the override).
+  - **Native AutoMod** (`automod.native`): show `enabled`, `minSeverity`, `ruleId`; syncing needs the
+    bot — tell admins to run `/automod native action:sync` after changing words.
 - **Reviews:** list `guild_verifications` with `status='flagged'` joined with the session reasons
   and linked accounts. Approve / Deny / Ban → publish `REDIS_CHANNELS.verificationReview`
   (`VerificationReviewMessage` `{ guildId, userId, decision, reviewerId, reason? }`); the bot
@@ -453,7 +457,8 @@ parseEncryptionKey(base64) → Buffer;  encryptSecret(plain, key) → string;  d
 hmacHash(value, pepper) → hex;  ipPrefix(ip) → '/24' or '/48' prefix;  maskSecret(s);  randomToken(bytes?);  safeEqual(a, b)
 // @quill/shared/config (browser-safe)
 parseGuildConfig(raw) → { config, invalidModules };  validateGuildConfig(raw) → { ok, config } | { ok: false, error }
-getAtPath / setAtPath / unsetAtPath;  DEFAULT_GUILD_CONFIG;  GuildConfigSchema + per-module schemas;  DEFAULT_TEMPLATES
+getAtPath / setAtPath / unsetAtPath;  DEFAULT_GUILD_CONFIG;  GuildConfigSchema + per-module schemas
+DEFAULT_TEMPLATES, TEMPLATE_KEYS, TEMPLATE_LABELS, TEMPLATE_VARIABLES, MessageTemplateSchema
 // @quill/core/verification
 scoreIdentityLink(signals: ('device'|'ip'|'ip_prefix')[], { isProxy, lastSeenDaysAgo }) → 0..1
 evaluateVerification({ userId, accountCreatedAt, config, whitelisted, isProxy,

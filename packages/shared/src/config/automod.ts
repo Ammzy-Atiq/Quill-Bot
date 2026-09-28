@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { DEFAULT_ENABLED_WORD_CATEGORIES, WORD_CATEGORIES, type WordCategory } from '../wordlists.js';
-import { detectorBase, RateSchema, SnowflakeList } from './common.js';
+import { detectorBase, NullableSnowflake, RateSchema, SnowflakeList } from './common.js';
 
 const wordCategoryToggle = (enabled: boolean) =>
   z
@@ -135,9 +135,23 @@ export const AiDetectorSchema = z
   })
   .prefault({});
 
+/** Mirror of the worst terms into Discord's native AutoMod (blocks before the message is posted). */
+export const NativeSyncSchema = z
+  .object({
+    enabled: z.boolean().default(false),
+    /** Built-in terms at or above this severity are mirrored (custom words always are). */
+    minSeverity: z.number().int().min(1).max(5).default(4),
+    /** Discord AutoMod rule QUILL manages (set by /automod native sync). */
+    ruleId: NullableSnowflake,
+    blockMessage: z.string().max(150).default('Blocked by QUILL GUARD.'),
+  })
+  .prefault({});
+export type NativeSyncConfig = z.infer<typeof NativeSyncSchema>;
+
 export const AutomodConfigSchema = z
   .object({
     enabled: z.boolean().default(true),
+    native: NativeSyncSchema,
     normalizer: NormalizerConfigSchema,
     exempt: z
       .object({
