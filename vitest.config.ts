@@ -6,6 +6,7 @@ export default defineConfig({
       'packages/*/src/**/*.test.ts',
       'packages/*/test/**/*.test.ts',
       'apps/bot/{src,test}/**/*.test.ts',
+      'apps/website/**/*.test.ts',
     ],
     environment: 'node',
     reporters: 'default',

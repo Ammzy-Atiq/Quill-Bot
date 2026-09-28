@@ -1,6 +1,27 @@
 /**
  * @quill/core — QUILL GUARD's framework-free engine. Runs in Node and in browsers.
  */
+
+export {
+  type AntiNukeDecision,
+  type AntiNukeInput,
+  assessThreat,
+  evaluateAntiNuke,
+  type RecentAction,
+  resolveTrust,
+  THREAT_WEIGHTS,
+  type ThreatAssessment,
+  type TrustInput,
+  type TrustLevel,
+} from './antinuke/engine.js';
+export {
+  SCENARIOS,
+  type Scenario,
+  type SimulationResult,
+  type SimulationStep,
+  simulate,
+} from './antinuke/simulate.js';
+export { evaluateJoin, type JoinDecision, type JoinInput, nameSkeleton } from './antiraid/evaluate.js';
 export {
   OFFICIAL_DOMAINS,
   PROTECTED_BRANDS,

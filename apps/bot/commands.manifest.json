@@ -94,10 +94,7 @@
               "required": true
             },
             {
-              "channel_types": [
-                0,
-                5
-              ],
+              "channel_types": [0, 5],
               "name": "channel",
               "description": "Channel to post in",
               "required": true,
@@ -818,12 +815,7 @@
               "description": "Exempt a channel or category.",
               "options": [
                 {
-                  "channel_types": [
-                    0,
-                    4,
-                    5,
-                    15
-                  ],
+                  "channel_types": [0, 4, 5, 15],
                   "name": "channel",
                   "description": "Channel",
                   "required": true,

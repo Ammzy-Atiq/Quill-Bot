@@ -40,10 +40,13 @@ Legend: ✅ done · 🚧 in progress · ⏳ planned. Owners: **bot-agent** (this
 | `/help` `/about` `/ping` `/setup` `/logs` `/case` | ✅ | bot-agent | |
 | Core engine: normalizer, 2800+ word lists, matcher, risk engine, verification evaluator | ✅ | bot-agent | `evaluateVerification` / `scoreIdentityLink` ready for the website |
 | AutoMod module (detectors, BYOK AI, policies, templates, risk ladder) | ✅ | bot-agent | `/automod` `/policy` `/ai` `/risk`, log cards with moderator buttons |
-| Anti-Nuke + Anti-Raid + snapshots/recovery + worker jobs | ⏳ | bot-agent | Phase 4 |
+| Anti-Nuke + Anti-Raid engine (`packages/core`) | ✅ | bot-agent | trust model, strict/threshold, threat scoring, anti-betray, 8 red-team scenarios, join evaluation |
+| Anti-Nuke + Anti-Raid services (`apps/bot`) | ✅ | bot-agent | audit-log mapping, punish, revert (incl. retroactive), live incident cards, emergency mode, snapshots + restore, raid mode |
+| Anti-Nuke commands + events (`/antinuke /whitelist /extraowner /emergency /backup /antiraid /incident`) | 🚧 | bot-agent | Phase 4 — in progress |
+| Shared verification repository (`verificationRepo` in `packages/db`) | ⏳ | bot-agent | Next after Phase 4; signatures in `apps/website/AGENTS.md` §6 |
 | Verification (bot side), SSO, evasion, member backup job | ⏳ | bot-agent | Phase 5 |
 | Moderation commands, `/messages`, native AutoMod sync | ⏳ | bot-agent | Phase 6 |
-| Website (landing, verify flow, OAuth, fingerprint, dashboard) | ⏳ | website-agent | Spec: `apps/website/AGENTS.md` |
+| Website (landing, verify flow, OAuth, fingerprint, dashboard) | ⏳ ready to start | website-agent | Spec: `apps/website/AGENTS.md` — begin with §0 *Start here* |
 
 ---
 
@@ -52,6 +55,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ planned. Owners: **bot-agent** (this
 ```
 Quill-Bot/
 ├─ AGENTS.md                ← you are here (master guide; keep updated)
+├─ CLAUDE.md                ← pointer for Claude Code (imports AGENTS.md); same in apps/website
 ├─ README.md                ← human quick-start
 ├─ .env.example             ← every environment variable, documented
 ├─ docker-compose.yml       ← postgres + redis (+ bot + worker)
@@ -66,10 +70,12 @@ Quill-Bot/
 │  │  ├─ src/app.ts         ← App container (client, db, store, services)
 │  │  ├─ src/framework/     ← command/component/event types, router, permissions, custom ids
 │  │  ├─ src/ui/            ← Components V2 kit: Card, presets, respond helpers, limits
-│  │  ├─ src/services/      ← guild config cache, trust, logs, cases
-│  │  ├─ src/modules/       ← feature modules (general, logging, cases, automod, antinuke, …)
+│  │  ├─ src/services/      ← guild config cache, trust, logs, cases, moderation, risk
+│  │  ├─ src/modules/       ← feature modules: core, general, logging, cases, moderation,
+│  │  │                        automod (+ ai/), antinuke (mapping, service, revert, emergency,
+│  │  │                        snapshots, serialize, cards), antiraid (service)
 │  │  ├─ src/worker/        ← job handlers
-│  │  ├─ scripts/           ← deploy-commands, export-manifest
+│  │  ├─ scripts/           ← deploy-commands, export-manifest, verify-link (dev helper)
 │  │  └─ test/              ← bot tests
 │  └─ website/              ← QUILL website (Next.js)                  [website-agent]
 │     └─ AGENTS.md          ← FULL website build spec
@@ -77,8 +83,9 @@ Quill-Bot/
    ├─ shared/               ← zod config schemas, contracts, crypto, brand   (both sides)
    ├─ db/                   ← Drizzle schema, migrations, repositories      (both sides)
    └─ core/                 ← framework-free engine (runs in Node + browsers): normalizer, 2800+ word
-                               lists, Aho-Corasick matcher, risk engine, verification evaluator;
-                               detectors + anti-nuke scoring land here next (see packages/core/AGENTS.md)
+                               lists, Aho-Corasick matcher, detectors, risk engine, anti-nuke +
+                               anti-raid scoring, red-team simulations, verification evaluator
+                               (subpath exports: /normalizer /verification /antinuke)
 ```
 
 Workspace packages are consumed **as TypeScript source** (`exports` → `./src/*.ts`). Anything
@@ -110,9 +117,14 @@ that runs them (tsx, Vitest, tsup, Next.js `transpilePackages`) compiles them on
 1. **Message → AutoMod:** `messageCreate` → exemptions → `core.normalize()` → detectors
    (words/spam/links/scam/harassment/toxicity/policies, AI only for borderline or when configured)
    → violations → `core.risk.decide()` → actions (delete/warn/timeout/…) → case + log card.
-2. **Audit log → Anti-Nuke:** `guildAuditLogEntryCreate` (actor = `executorId`) → map to an
-   `AntiNukeAction` → trust check (owner/extra owner/whitelist flag) → strict or threshold
-   window (Redis) → threat level → punishment + revert → incident + log → maybe emergency mode.
+2. **Audit log → Anti-Nuke:** `guildAuditLogEntryCreate` (actor = `executorId`) or an @everyone
+   ping → `mapAuditEntry` → `AntiNukeAction` (+ "dangerous" flag) → decisions serialized per guild:
+   trust (`resolveTrust`: owner > QUILL > extra owners > per-action whitelist; whitelisted users
+   lose trust while emergency mode is on) → Redis windows (per action + threat window) →
+   `evaluateAntiNuke` (strict/threshold, anti-betray, raid-mode tightening) → security event →
+   incident (opened on punishment / high threat) with a live log card → punishment once per burst
+   → revert queue (the event, and on the first punishment every earlier action of that actor in
+   the window) → auto emergency mode at the configured threat level.
 3. **Verification:** member presses *Verify* → bot sends a signed link
    (`signVerificationToken`) → website: consent → captcha → fingerprint → Discord OAuth →
    `core` evasion matcher → DB rows → Redis `quill:verification:completed` → the shard owning the
@@ -238,6 +250,52 @@ fallbacks `fallbacks: "default"`; servers can pick a cheaper model such as `clau
 OpenAI Moderation endpoint (`omni-moderation-latest`), any OpenAI-compatible API, Google Gemini.
 Keys are AES-256-GCM encrypted in `ai_credentials`, per-minute + monthly caps in Redis.
 
+### Anti-Nuke / Anti-Raid data (bot writes, website reads)
+
+**Incident summary** — `incidents.summary` (JSONB), defined in
+`apps/bot/src/modules/antinuke/types.ts` (`IncidentSummary`):
+```ts
+{
+  trust: 'untrusted' | 'whitelisted' | 'extra_owner' | null,   // actor's trust when it happened
+  threatScore: number,                                          // peak threat score
+  counts: { [action: AntiNukeAction]: number },                 // protected actions in the incident
+  punishment: null | { type: 'ban'|'kick'|'strip_roles'|'quarantine'|'alert', ok: boolean,
+                       error: string|null, caseNumber: number|null, previousRoles: string[],
+                       quarantineRoleId: string|null, bot: boolean },
+  reverts: { reverted: number, failed: number, skipped: number },
+  emergency: boolean,                                           // emergency mode was triggered
+  timeline: Array<{ at: number /* epoch ms */, text: string /* Discord markdown, max 14, newest last */ }>,
+  log: { channelId: string, messageId: string } | null,         // the live log card
+  notes: string[],
+  raid?: { reason: string, joins: number, actioned: number, action: string,   // module = 'antiraid'
+           endsAt: number|null, endedAt: number|null, invitesPaused: boolean }
+}
+```
+`incidents.status`: `open` (running, or QUILL could not punish) · `contained` (punished) ·
+`resolved` (closed without punishment, or marked resolved). `incidents.threatLevel`: peak level.
+
+**Security events** — `security_events`: one row per protected action by a non-owner.
+`module` `antinuke|antiraid`; `action` = an `AntiNukeAction` key or `webhook_everyone_spam` /
+`join_filtered`; `severity` 1–4 (= threat level rank + 1); `trust`; `details`
+(`{ dangerous, count, limit, threat, raidMode }`); `response`
+(`{ punish, punishment, revert, reason }`).
+
+**Snapshot data** — `snapshots.data` (JSONB, `GuildSnapshotData` v1 in
+`apps/bot/src/modules/antinuke/serialize.ts`): `{ version: 1, takenAt, guild: { name,
+verificationLevel, explicitContentFilter, defaultMessageNotifications, afkChannelId, afkTimeout,
+systemChannelId, description }, roles: [{ id, name, color, hoist, position, permissions (string
+bitfield), mentionable, unicodeEmoji, members? }], channels: [{ id, type, name, parentId,
+position, topic, nsfw, rateLimitPerUser, bitrate, userLimit, overwrites: [{ id, type: 0 role |
+1 member, allow, deny }] }] }`. Kinds: `auto` (every `snapshotIntervalHours`, pruned to
+`snapshotRetention`), `manual`, `pre_emergency`. Restores run in the bot (they need live guild state).
+
+**Raid mode** — Redis key `redisKeys.raidMode(guildId)` (TTL = raid duration), JSON
+`{ reason, by: userId|null, startedAt, endsAt, incidentNumber }`. Absent = no raid.
+
+**Emergency mode** — `emergency_states` row per guild: `active`, `reason`, `automatic`,
+`triggeredBy`, `startedAt`, `endedAt`; `previous` holds what QUILL changed (role permissions,
+@everyone overwrites, invites paused) so `/emergency end` can restore it.
+
 ---
 
 ## 8. Bot ↔ Website contracts
@@ -252,6 +310,11 @@ this section in the same change.**
 | `quill:config:invalidate` | anyone who writes config | `ConfigInvalidateMessage` |
 | `quill:trust:invalidate` | anyone who writes trust entries | `TrustInvalidateMessage` |
 | `quill:identity:revoked` | website → bot | user deleted data / revoked OAuth |
+| `quill:verification:review` | website → bot | `VerificationReviewMessage` (approve / deny / ban a flagged member) |
+| `quill:wordlist:invalidate` | anyone who edits custom words / policies | `WordlistInvalidateMessage` |
+| `trust_entries` writes | bot + website | whitelist = user + action keys; extra owners are **owner-only**, max `antinuke.maxExtraOwners`, never bots; publish `quill:trust:invalidate` after every change |
+| Anti-Nuke / Anti-Raid data | bot → website (read-only) | `incidents.summary`, `security_events`, `snapshots.data`, `emergency_states`, raid-mode key — formats in §7 |
+| Dev verification links | bot tooling → website dev | `pnpm verify:link <guildId> <userId>` (same token as the bot's Verify button) |
 | Tables written by the website | website | `verification_sessions`, `guild_verifications`, `verified_identities`, `fingerprints`, `identity_links`, `oauth_grants` |
 | Tables written by the bot | bot | everything else; the website may **read** them and may write `guild_settings` (dashboard) following §6 Config rules |
 | Commands manifest | bot → website | `apps/bot/commands.manifest.json` (`pnpm commands:manifest`) |
@@ -270,6 +333,22 @@ this section in the same change.**
 6. If you find a bug in another agent's area, write it under *Open issues* (§10) instead of fixing
    it silently — unless it blocks you and the fix is tiny.
 
+**File ownership**
+
+| Path | Owner | Others may |
+|---|---|---|
+| `apps/bot/**`, `packages/core/**` | bot-agent | read / import |
+| `apps/website/**` | website-agent | read |
+| `packages/db/src/schema/**`, `packages/db/migrations/**`, `packages/db/src/repositories/**` | bot-agent | website-only queries live in `apps/website/src/server/db/`; request schema changes under *Open issues* |
+| `packages/shared/**` | shared | additive changes (new exports, new fields with defaults); contract changes → §8 + *Open issues* |
+| `AGENTS.md`, `.env.example`, `vitest.config.ts`, `biome.json`, `pnpm-workspace.yaml` | shared | edit only your own rows/sections; keep edits small and additive |
+| `pnpm-lock.yaml`, `commands.manifest.json`, `migrations/*` | generated | never hand-edit (lockfile conflict → take either side, run `pnpm install`) |
+
+**Git workflow:** each agent works on its own branch (bot-agent: `claude/intelligent-franklin-7wwval`
+until merged to `main`; website-agent: e.g. `website/main`). Merge the integration branch into your
+branch regularly; never rebase or force-push a branch someone else pulls. `CLAUDE.md` files only
+import the matching `AGENTS.md` — edit `AGENTS.md`, never duplicate content into them.
+
 ---
 
 ## 10. Commands & operations
@@ -284,6 +363,7 @@ pnpm dev:bot                      # run one shard with hot reload
 pnpm dev:worker                   # run the worker
 pnpm check                        # lint + typecheck + tests
 pnpm --filter @quill/bot check:boot   # boot check without secrets (--dry-run)
+pnpm verify:link <guildId> <userId>   # dev: print a signed verification link for the website
 TEST_DATABASE_URL=postgres://… pnpm test   # include DB integration tests
 pnpm build && node apps/bot/dist/index.js   # production (sharded)
 docker compose up -d --build      # full stack in Docker
@@ -304,6 +384,24 @@ overwrite); put the QUILL role at the top of the role list; add the website's OA
 ---
 
 ## 11. Changelog
+
+- **Docs — ready for parallel website work** (bot-agent): `apps/website/AGENTS.md` gained §0
+  *Start here* (setup checklist, what already exists, ownership, git workflow, dev helpers), a
+  data-model cheat-sheet, the library API list, planned `verificationRepo` signatures, Discord API
+  notes and anti-nuke dashboard pages; root §7 documents incident/snapshot/security-event/raid
+  formats, §8 the new contracts, §9 file ownership. Added `CLAUDE.md` pointers,
+  `pnpm verify:link`, `@quill/core` subpath exports (`/normalizer`, `/verification`, `/antinuke`,
+  `sideEffects: false`) and the `apps/website/**/*.test.ts` Vitest glob.
+
+- **Phase 4 — Anti-Nuke + Anti-Raid** (bot-agent, 🚧 in progress): core engine (`resolveTrust`,
+  `evaluateAntiNuke` strict/threshold with anti-betray + raid tightening, `assessThreat` with combo
+  multipliers, 8 red-team `SCENARIOS` + `simulate()`, `evaluateJoin`); `securityRepo` (incidents,
+  security events, snapshots, emergency state); bot services: audit-log mapping, `AntiNukeService`
+  (per-guild serialized decisions, punish once per burst, retroactive revert, live incident cards,
+  owner DM fallback, webhook @everyone spam), `Reverter` (unban, re-create channels/roles/emojis/
+  AutoMod rules from cache → snapshot → audit data, roll back guild/channel/role/webhook edits,
+  re-point config ids), `EmergencyService`, `SnapshotService` (scheduler + restore),
+  `AntiRaidService` (join filters, raid mode, wave sweep). Commands and events next.
 
 - **Phase 3 — AutoMod** (bot-agent): core detectors (words with evasion bump, spam incl.
   cross-channel blasts, links/invites incl. obfuscated invites and masked links, scams with

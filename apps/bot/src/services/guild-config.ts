@@ -125,6 +125,27 @@ export class GuildConfigService {
     throw new UserError('Could not save the setting, please try again.');
   }
 
+  /**
+   * Replaces every reference to `oldId` in the stored config (single values and id lists) with
+   * `newId`. Used after QUILL re-creates a deleted channel/role so log channels, exempt lists and
+   * roles keep working. Returns how many settings changed.
+   */
+  async replaceId(guildId: string, actorId: string, oldId: string, newId: string): Promise<number> {
+    const { raw } = await this.entry(guildId);
+    const changes: ConfigChange[] = [];
+    const walk = (value: unknown, path: string[]) => {
+      if (value === oldId) changes.push({ path, value: newId });
+      else if (Array.isArray(value)) {
+        if (value.includes(oldId)) changes.push({ path, value: value.map((v) => (v === oldId ? newId : v)) });
+      } else if (value && typeof value === 'object') {
+        for (const [key, child] of Object.entries(value)) walk(child, [...path, key]);
+      }
+    };
+    walk(raw, []);
+    if (changes.length > 0) await this.update(guildId, actorId, changes);
+    return changes.length;
+  }
+
   set(guildId: string, actorId: string, path: ConfigPath, value: unknown): Promise<GuildConfig> {
     return this.update(guildId, actorId, [{ path, value }]);
   }

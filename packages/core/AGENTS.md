@@ -18,8 +18,16 @@ landing page, `evaluateVerification` in the verify flow), so:
 | `src/matcher/` | `AhoCorasick` + `WordMatcher` (built-in lists share one instance; custom words get their own). Handles doubled-letter collisions (`nigger` vs `Niger`, `butt` vs `but`) and never lets substring hits span normal words (`this hit` ≠ `shit`). |
 | `src/wordlist/` | Word entry types, `parseWordlist()` for the source format. |
 | `src/data/wordlists/` | **2800+ built-in terms**, one file per category, 14 languages. |
+| `src/detectors/` | `runDetectors()` pipeline + detectors: words (evasion bump), spam, links/invites, scam (phishing, look-alike/homograph domains, scam phrases, image hashes), harassment, toxicity, custom policies. |
+| `src/data/scam.ts` | Official domains, protected brands, seed phishing domains, scam phrase patterns. |
 | `src/risk/` | `evaluateRisk()` — decaying score, trust multipliers, repeat multiplier, ladder steps that re-arm after decay. |
+| `src/antinuke/` | `resolveTrust()` (owner > QUILL > extra owners > per-action whitelist), `assessThreat()` (weights + combo multipliers → normal/suspicious/high/critical), `evaluateAntiNuke()` (strict / threshold, anti-betray, raid tightening, auto-emergency), `SCENARIOS` + `simulate()` red-team replays (also unit tests). |
+| `src/antiraid/` | `evaluateJoin()` (join spike → raid mode, account age / avatar / look-alike name filters), `nameSkeleton()`. |
 | `src/verification/` | `scoreIdentityLink()` + `evaluateVerification()` (pass / flag / block, reason codes). Used by the website. |
+
+**Entry points:** `@quill/core` (everything) plus light subpaths for the website bundle —
+`@quill/core/normalizer`, `@quill/core/verification`, `@quill/core/antinuke`
+(`sideEffects: false`, so unused word lists are tree-shaken).
 
 ## Word list format (`src/data/wordlists/<category>.ts`)
 

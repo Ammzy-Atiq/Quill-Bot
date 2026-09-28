@@ -5,8 +5,12 @@
   "description": "QUILL GUARD core engine (framework-free): normalizer, word lists, detectors, risk engine, anti-nuke & anti-raid scoring, verification matcher.",
   "author": "Atiq Ur Rahman",
   "type": "module",
+  "sideEffects": false,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./normalizer": "./src/normalizer/normalize.ts",
+    "./verification": "./src/verification/evaluate.ts",
+    "./antinuke": "./src/antinuke/index.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

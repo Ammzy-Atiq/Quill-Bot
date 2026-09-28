@@ -19,7 +19,8 @@
     "typecheck": "tsc -p tsconfig.json",
     "commands:deploy": "tsx scripts/deploy-commands.ts",
     "commands:manifest": "tsx scripts/export-manifest.ts",
-    "check:boot": "tsx src/shard.ts --dry-run"
+    "check:boot": "tsx src/shard.ts --dry-run",
+    "verify:link": "tsx scripts/verify-link.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.128.0",

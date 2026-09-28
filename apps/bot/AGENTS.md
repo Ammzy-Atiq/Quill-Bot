@@ -13,9 +13,13 @@ accent colour, permission model, privacy) apply here.
 | `src/client.ts` | Intents, partials, cache limits |
 | `src/framework/` | `types.ts` (SlashCommand, ComponentHandler, EventHandler, BotModule, UserError), `router.ts`, `permissions.ts`, `custom-id.ts`, `registry.ts` |
 | `src/ui/` | `Card` builder, presets (success/error/warning/info/confirm), `reply`/`update`/`send`, V2 limit checks, emojis |
-| `src/services/` | `configs` (cached guild config + updates), `trust` (extra owners/whitelist), `logs` (log channels), `cases` |
+| `src/services/` | `configs` (cached guild config + updates, `replaceId`), `trust` (extra owners/whitelist), `logs` (log channels), `cases`, `moderation` (hierarchy-checked punishments → cases), `risk` (Redis + Postgres scores) |
 | `src/modules/<name>/` | Feature modules. Each exports a `BotModule` registered in `src/modules/index.ts` |
-| `src/lib/` | store (Redis/memory), LRU, formatting, links, migrations |
+| `src/modules/automod/` | pipeline service, data (matchers, scam data), image hashes, panel/cards, `/automod /policy /ai /risk`, `ai/` providers (BYOK) |
+| `src/modules/antinuke/` | `mapping.ts` (audit entry → action), `service.ts` (`app.antinuke`: decisions, punish, incidents), `revert.ts` (`Reverter`), `emergency.ts` (`app.emergency`), `snapshots.ts` (`app.snapshots`), `serialize.ts` (snapshot format), `cards.ts` (incident card), `types.ts` |
+| `src/modules/antiraid/` | `service.ts` (`app.antiraid`: join filters, raid mode) |
+| `src/lib/` | store (Redis/memory), LRU, formatting, links, migrations, action choices |
+| `scripts/` | `deploy-commands.ts`, `export-manifest.ts`, `verify-link.ts` (dev: signed verification link for the website) |
 
 ## Add a command
 ```ts

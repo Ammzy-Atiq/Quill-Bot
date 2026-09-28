@@ -9,6 +9,10 @@ import { routeInteraction } from './framework/router.js';
 import type { BotModule } from './framework/types.js';
 import type { KeyValueStore } from './lib/store.js';
 import type { Logger } from './logger.js';
+import { EmergencyService } from './modules/antinuke/emergency.js';
+import { AntiNukeService } from './modules/antinuke/service.js';
+import { SnapshotService } from './modules/antinuke/snapshots.js';
+import { AntiRaidService } from './modules/antiraid/service.js';
 import { AiService } from './modules/automod/ai/service.js';
 import { AutomodData } from './modules/automod/data.js';
 import { AutomodService } from './modules/automod/service.js';
@@ -42,6 +46,10 @@ export class App {
   readonly automodData: AutomodData;
   readonly automod: AutomodService;
   readonly ai: AiService;
+  readonly snapshots: SnapshotService;
+  readonly emergency: EmergencyService;
+  readonly antinuke: AntiNukeService;
+  readonly antiraid: AntiRaidService;
 
   constructor(
     readonly env: Env,
@@ -62,6 +70,10 @@ export class App {
     this.automodData = new AutomodData(this);
     this.automod = new AutomodService(this);
     this.ai = new AiService(this);
+    this.snapshots = new SnapshotService(this);
+    this.emergency = new EmergencyService(this);
+    this.antinuke = new AntiNukeService(this);
+    this.antiraid = new AntiRaidService(this);
   }
 
   /** Thumbnail used on QUILL cards: BRAND_LOGO_URL, else the bot avatar. */
@@ -81,6 +93,7 @@ export class App {
     await this.configs.init();
     await this.trust.init();
     await this.automodData.init();
+    this.antinuke.start();
     for (const module of this.registry.modules) await module.init?.(this);
 
     for (const handler of this.registry.events) {
@@ -105,6 +118,8 @@ export class App {
 
   async shutdown(): Promise<void> {
     this.logger.info('shutting down');
+    this.snapshots.stop();
+    this.antinuke.stop();
     await this.client.destroy();
     await this.store.close();
   }

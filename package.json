@@ -25,6 +25,7 @@
     "dev:worker": "pnpm --filter @quill/bot dev:worker",
     "commands:deploy": "pnpm --filter @quill/bot commands:deploy",
     "commands:manifest": "pnpm --filter @quill/bot commands:manifest",
+    "verify:link": "pnpm --filter @quill/bot verify:link",
     "wordlist:validate": "pnpm --filter @quill/core wordlist:validate",
     "check": "pnpm lint && pnpm typecheck && pnpm test"
   },
