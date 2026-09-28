@@ -1,0 +1,1455 @@
+{
+  "generatedAt": "2026-09-28T09:55:17.817Z",
+  "commands": [
+    {
+      "module": "general",
+      "permission": "everyone",
+      "permissionLabel": "Everyone",
+      "subcommandPermissions": {},
+      "options": [],
+      "name": "help",
+      "description": "Learn what QUILL GUARD does and browse its commands.",
+      "type": 1
+    },
+    {
+      "module": "general",
+      "permission": "everyone",
+      "permissionLabel": "Everyone",
+      "subcommandPermissions": {},
+      "options": [],
+      "name": "about",
+      "description": "About QUILL GUARD and its creator.",
+      "type": 1
+    },
+    {
+      "module": "general",
+      "permission": "everyone",
+      "permissionLabel": "Everyone",
+      "subcommandPermissions": {},
+      "options": [],
+      "name": "ping",
+      "description": "Check QUILL GUARD latency.",
+      "type": 1
+    },
+    {
+      "module": "general",
+      "permission": "manager",
+      "permissionLabel": "Manage Server",
+      "subcommandPermissions": {},
+      "options": [],
+      "name": "setup",
+      "description": "Open the QUILL GUARD setup panel.",
+      "default_member_permissions": "32",
+      "type": 1
+    },
+    {
+      "module": "logging",
+      "permission": "manager",
+      "permissionLabel": "Manage Server",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "type": 1,
+          "name": "set",
+          "description": "Send a log category to a channel.",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Default (every category without its own channel)",
+                  "value": "default"
+                },
+                {
+                  "name": "AutoMod",
+                  "value": "automod"
+                },
+                {
+                  "name": "Anti-Nuke",
+                  "value": "antinuke"
+                },
+                {
+                  "name": "Anti-Raid",
+                  "value": "antiraid"
+                },
+                {
+                  "name": "Verification",
+                  "value": "verification"
+                },
+                {
+                  "name": "Moderation",
+                  "value": "moderation"
+                },
+                {
+                  "name": "Member joins & leaves",
+                  "value": "members"
+                },
+                {
+                  "name": "Configuration changes",
+                  "value": "config"
+                }
+              ],
+              "name": "category",
+              "description": "Log category",
+              "required": true
+            },
+            {
+              "channel_types": [
+                0,
+                5
+              ],
+              "name": "channel",
+              "description": "Channel to post in",
+              "required": true,
+              "type": 7
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "clear",
+          "description": "Stop sending a log category to its own channel.",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Default (every category without its own channel)",
+                  "value": "default"
+                },
+                {
+                  "name": "AutoMod",
+                  "value": "automod"
+                },
+                {
+                  "name": "Anti-Nuke",
+                  "value": "antinuke"
+                },
+                {
+                  "name": "Anti-Raid",
+                  "value": "antiraid"
+                },
+                {
+                  "name": "Verification",
+                  "value": "verification"
+                },
+                {
+                  "name": "Moderation",
+                  "value": "moderation"
+                },
+                {
+                  "name": "Member joins & leaves",
+                  "value": "members"
+                },
+                {
+                  "name": "Configuration changes",
+                  "value": "config"
+                }
+              ],
+              "name": "category",
+              "description": "Log category",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "view",
+          "description": "Show where every log category goes.",
+          "options": []
+        }
+      ],
+      "name": "logs",
+      "description": "Choose where QUILL GUARD posts its logs.",
+      "default_member_permissions": "32",
+      "type": 1
+    },
+    {
+      "module": "moderation",
+      "permission": "moderator",
+      "permissionLabel": "Moderator",
+      "subcommandPermissions": {
+        "delete": "manager"
+      },
+      "options": [
+        {
+          "type": 1,
+          "name": "view",
+          "description": "Show one case.",
+          "options": [
+            {
+              "min_value": 1,
+              "type": 4,
+              "name": "number",
+              "description": "Case number",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "history",
+          "description": "Show a member's case history.",
+          "options": [
+            {
+              "name": "user",
+              "description": "Member",
+              "required": true,
+              "type": 6
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "reason",
+          "description": "Change the reason of a case.",
+          "options": [
+            {
+              "min_value": 1,
+              "type": 4,
+              "name": "number",
+              "description": "Case number",
+              "required": true
+            },
+            {
+              "type": 3,
+              "name": "reason",
+              "description": "New reason",
+              "required": true,
+              "max_length": 1000
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "delete",
+          "description": "Mark a case inactive (e.g. remove a warning).",
+          "options": [
+            {
+              "min_value": 1,
+              "type": 4,
+              "name": "number",
+              "description": "Case number",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "name": "case",
+      "description": "View and manage moderation cases.",
+      "default_member_permissions": "1099511627776",
+      "type": 1
+    },
+    {
+      "module": "automod",
+      "permission": "manager",
+      "permissionLabel": "Manage Server",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "type": 1,
+          "name": "panel",
+          "description": "Open the AutoMod dashboard.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "test",
+          "description": "Dry-run a message through AutoMod and see what it detects.",
+          "options": [
+            {
+              "type": 3,
+              "name": "text",
+              "description": "Text to test",
+              "required": true,
+              "max_length": 2000
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "toggle",
+          "description": "Turn a detector on or off.",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Word filter",
+                  "value": "words"
+                },
+                {
+                  "name": "Spam",
+                  "value": "spam"
+                },
+                {
+                  "name": "Links & advertising",
+                  "value": "links"
+                },
+                {
+                  "name": "Scams & compromised accounts",
+                  "value": "scam"
+                },
+                {
+                  "name": "Harassment",
+                  "value": "harassment"
+                },
+                {
+                  "name": "Toxicity",
+                  "value": "toxicity"
+                },
+                {
+                  "name": "AI analysis (your API key)",
+                  "value": "ai"
+                }
+              ],
+              "name": "detector",
+              "description": "Detector",
+              "required": true
+            },
+            {
+              "name": "enabled",
+              "description": "On or off",
+              "required": true,
+              "type": 5
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "shadow",
+          "description": "Shadow mode: detect and log, but never act (great for tuning).",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Word filter",
+                  "value": "words"
+                },
+                {
+                  "name": "Spam",
+                  "value": "spam"
+                },
+                {
+                  "name": "Links & advertising",
+                  "value": "links"
+                },
+                {
+                  "name": "Scams & compromised accounts",
+                  "value": "scam"
+                },
+                {
+                  "name": "Harassment",
+                  "value": "harassment"
+                },
+                {
+                  "name": "Toxicity",
+                  "value": "toxicity"
+                },
+                {
+                  "name": "AI analysis (your API key)",
+                  "value": "ai"
+                }
+              ],
+              "name": "detector",
+              "description": "Detector",
+              "required": true
+            },
+            {
+              "name": "enabled",
+              "description": "Shadow mode on or off",
+              "required": true,
+              "type": 5
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "response",
+          "description": "Choose what a detector does when it fires.",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Word filter",
+                  "value": "words"
+                },
+                {
+                  "name": "Spam",
+                  "value": "spam"
+                },
+                {
+                  "name": "Links & advertising",
+                  "value": "links"
+                },
+                {
+                  "name": "Scams & compromised accounts",
+                  "value": "scam"
+                },
+                {
+                  "name": "Harassment",
+                  "value": "harassment"
+                },
+                {
+                  "name": "Toxicity",
+                  "value": "toxicity"
+                },
+                {
+                  "name": "AI analysis (your API key)",
+                  "value": "ai"
+                }
+              ],
+              "name": "detector",
+              "description": "Detector",
+              "required": true
+            },
+            {
+              "name": "delete",
+              "description": "Delete the message",
+              "required": false,
+              "type": 5
+            },
+            {
+              "max_value": 10,
+              "min_value": 0,
+              "type": 10,
+              "name": "points",
+              "description": "Risk points multiplier (0 = none, 1 = normal)",
+              "required": false
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "None (only delete / add risk)",
+                  "value": "none"
+                },
+                {
+                  "name": "Warn",
+                  "value": "warn"
+                },
+                {
+                  "name": "Timeout",
+                  "value": "timeout"
+                },
+                {
+                  "name": "Quarantine",
+                  "value": "quarantine"
+                },
+                {
+                  "name": "Remove roles",
+                  "value": "strip_roles"
+                },
+                {
+                  "name": "Kick",
+                  "value": "kick"
+                },
+                {
+                  "name": "Softban (kick + delete messages)",
+                  "value": "softban"
+                },
+                {
+                  "name": "Ban",
+                  "value": "ban"
+                }
+              ],
+              "name": "action",
+              "description": "Immediate action (on top of the risk ladder)",
+              "required": false
+            },
+            {
+              "type": 3,
+              "name": "duration",
+              "description": "Timeout length, e.g. 10m, 1h, 1d",
+              "required": false
+            },
+            {
+              "name": "notify",
+              "description": "DM the member",
+              "required": false,
+              "type": 5
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "normalizer",
+          "description": "Turn a normalizer stage on or off.",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "unicode",
+                  "value": "unicode"
+                },
+                {
+                  "name": "invisible",
+                  "value": "invisible"
+                },
+                {
+                  "name": "zalgo",
+                  "value": "zalgo"
+                },
+                {
+                  "name": "confusables",
+                  "value": "confusables"
+                },
+                {
+                  "name": "leetspeak",
+                  "value": "leetspeak"
+                },
+                {
+                  "name": "separators",
+                  "value": "separators"
+                },
+                {
+                  "name": "repetition",
+                  "value": "repetition"
+                }
+              ],
+              "name": "stage",
+              "description": "Stage",
+              "required": true
+            },
+            {
+              "name": "enabled",
+              "description": "On or off",
+              "required": true,
+              "type": 5
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "spam",
+          "description": "Tune spam limits.",
+          "options": [
+            {
+              "max_value": 100,
+              "min_value": 2,
+              "type": 4,
+              "name": "messages",
+              "description": "Max messages per window",
+              "required": false
+            },
+            {
+              "max_value": 120,
+              "min_value": 2,
+              "type": 4,
+              "name": "window",
+              "description": "Window in seconds",
+              "required": false
+            },
+            {
+              "max_value": 20,
+              "min_value": 2,
+              "type": 4,
+              "name": "duplicates",
+              "description": "Same message N times",
+              "required": false
+            },
+            {
+              "max_value": 50,
+              "min_value": 1,
+              "type": 4,
+              "name": "mentions",
+              "description": "Max mentions per message",
+              "required": false
+            },
+            {
+              "max_value": 200,
+              "min_value": 3,
+              "type": 4,
+              "name": "emojis",
+              "description": "Max emojis per message",
+              "required": false
+            },
+            {
+              "name": "caps",
+              "description": "Flag excessive caps",
+              "required": false,
+              "type": 5
+            }
+          ]
+        },
+        {
+          "type": 2,
+          "name": "words",
+          "description": "Word filter settings.",
+          "options": [
+            {
+              "type": 1,
+              "name": "category",
+              "description": "Turn a built-in category on/off or override its severity.",
+              "options": [
+                {
+                  "type": 3,
+                  "choices": [
+                    {
+                      "name": "Profanity",
+                      "value": "profanity"
+                    },
+                    {
+                      "name": "Sexual content",
+                      "value": "sexual"
+                    },
+                    {
+                      "name": "Racial / ethnic / religious slurs",
+                      "value": "slur_racial"
+                    },
+                    {
+                      "name": "LGBTQ+ slurs",
+                      "value": "slur_lgbtq"
+                    },
+                    {
+                      "name": "Ableist slurs",
+                      "value": "slur_ableist"
+                    },
+                    {
+                      "name": "Insults & harassment",
+                      "value": "insult"
+                    },
+                    {
+                      "name": "Self-harm encouragement",
+                      "value": "self_harm"
+                    },
+                    {
+                      "name": "Violence & threats",
+                      "value": "violence"
+                    },
+                    {
+                      "name": "Extremism & hate",
+                      "value": "extremism"
+                    },
+                    {
+                      "name": "Drugs",
+                      "value": "drugs"
+                    }
+                  ],
+                  "name": "category",
+                  "description": "Category",
+                  "required": true
+                },
+                {
+                  "name": "enabled",
+                  "description": "On or off",
+                  "required": true,
+                  "type": 5
+                },
+                {
+                  "max_value": 5,
+                  "min_value": 1,
+                  "type": 4,
+                  "name": "severity",
+                  "description": "Severity override (1–5)",
+                  "required": false
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "add",
+              "description": "Add a custom word or phrase.",
+              "options": [
+                {
+                  "type": 3,
+                  "name": "term",
+                  "description": "Word, phrase or regex",
+                  "required": true,
+                  "max_length": 200
+                },
+                {
+                  "type": 3,
+                  "choices": [
+                    {
+                      "name": "exact",
+                      "value": "exact"
+                    },
+                    {
+                      "name": "boundary",
+                      "value": "boundary"
+                    },
+                    {
+                      "name": "substring",
+                      "value": "substring"
+                    },
+                    {
+                      "name": "regex",
+                      "value": "regex"
+                    }
+                  ],
+                  "name": "match",
+                  "description": "How to match (default: whole word)",
+                  "required": false
+                },
+                {
+                  "max_value": 5,
+                  "min_value": 1,
+                  "type": 4,
+                  "name": "severity",
+                  "description": "Severity 1–5 (default 3)",
+                  "required": false
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "remove",
+              "description": "Remove a custom word.",
+              "options": [
+                {
+                  "autocomplete": true,
+                  "type": 3,
+                  "name": "term",
+                  "description": "Word",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "list",
+              "description": "Show categories and custom words.",
+              "options": []
+            },
+            {
+              "type": 1,
+              "name": "allow",
+              "description": "Never flag a word (fixes false positives).",
+              "options": [
+                {
+                  "type": 3,
+                  "name": "word",
+                  "description": "Word",
+                  "required": true,
+                  "max_length": 64
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "unallow",
+              "description": "Remove a word from the allowlist.",
+              "options": [
+                {
+                  "type": 3,
+                  "name": "word",
+                  "description": "Word",
+                  "required": true,
+                  "max_length": 64
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "disable",
+              "description": "Switch off one built-in term.",
+              "options": [
+                {
+                  "type": 3,
+                  "name": "term",
+                  "description": "Built-in term",
+                  "required": true,
+                  "max_length": 100
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "enable",
+              "description": "Switch a disabled built-in term back on.",
+              "options": [
+                {
+                  "type": 3,
+                  "name": "term",
+                  "description": "Built-in term",
+                  "required": true,
+                  "max_length": 100
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "min-severity",
+              "description": "Ignore built-in hits below this severity (default 2).",
+              "options": [
+                {
+                  "max_value": 5,
+                  "min_value": 1,
+                  "type": 4,
+                  "name": "level",
+                  "description": "1–5",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": 2,
+          "name": "exempt",
+          "description": "Exempt roles, channels or members from AutoMod.",
+          "options": [
+            {
+              "type": 1,
+              "name": "role",
+              "description": "Exempt a role.",
+              "options": [
+                {
+                  "name": "role",
+                  "description": "Role",
+                  "required": true,
+                  "type": 8
+                },
+                {
+                  "name": "exempt",
+                  "description": "true = exempt, false = remove",
+                  "required": true,
+                  "type": 5
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "channel",
+              "description": "Exempt a channel or category.",
+              "options": [
+                {
+                  "channel_types": [
+                    0,
+                    4,
+                    5,
+                    15
+                  ],
+                  "name": "channel",
+                  "description": "Channel",
+                  "required": true,
+                  "type": 7
+                },
+                {
+                  "name": "exempt",
+                  "description": "true = exempt, false = remove",
+                  "required": true,
+                  "type": 5
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "user",
+              "description": "Exempt a member.",
+              "options": [
+                {
+                  "name": "user",
+                  "description": "Member",
+                  "required": true,
+                  "type": 6
+                },
+                {
+                  "name": "exempt",
+                  "description": "true = exempt, false = remove",
+                  "required": true,
+                  "type": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": 2,
+          "name": "links",
+          "description": "Links & advertising.",
+          "options": [
+            {
+              "type": 1,
+              "name": "mode",
+              "description": "Which links are allowed.",
+              "options": [
+                {
+                  "type": 3,
+                  "choices": [
+                    {
+                      "name": "Off (allow all links)",
+                      "value": "off"
+                    },
+                    {
+                      "name": "Allowlist (only listed domains)",
+                      "value": "allowlist"
+                    },
+                    {
+                      "name": "Blocklist (all except listed domains)",
+                      "value": "blocklist"
+                    }
+                  ],
+                  "name": "mode",
+                  "description": "off = all links allowed",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "domain",
+              "description": "Add or remove a domain from the list.",
+              "options": [
+                {
+                  "type": 3,
+                  "name": "domain",
+                  "description": "e.g. youtube.com",
+                  "required": true,
+                  "max_length": 253
+                },
+                {
+                  "name": "add",
+                  "description": "true = add, false = remove",
+                  "required": true,
+                  "type": 5
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "invites",
+              "description": "Discord invite filter.",
+              "options": [
+                {
+                  "name": "block",
+                  "description": "Block invites to other servers",
+                  "required": true,
+                  "type": 5
+                },
+                {
+                  "name": "allow_own",
+                  "description": "Allow invites to this server",
+                  "required": false,
+                  "type": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": 2,
+          "name": "scam",
+          "description": "Scam intelligence.",
+          "options": [
+            {
+              "type": 1,
+              "name": "add-domain",
+              "description": "Report a scam domain (shared with every QUILL server).",
+              "options": [
+                {
+                  "type": 3,
+                  "name": "domain",
+                  "description": "Domain",
+                  "required": true,
+                  "max_length": 253
+                }
+              ]
+            },
+            {
+              "type": 1,
+              "name": "add-image",
+              "description": "Block an image (e.g. a fake giveaway screenshot) by its perceptual hash.",
+              "options": [
+                {
+                  "name": "image",
+                  "description": "The scam image",
+                  "required": true,
+                  "type": 11
+                },
+                {
+                  "type": 3,
+                  "name": "label",
+                  "description": "Label",
+                  "required": false,
+                  "max_length": 100
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "name": "automod",
+      "description": "Configure QUILL AutoMod.",
+      "default_member_permissions": "32",
+      "type": 1
+    },
+    {
+      "module": "automod",
+      "permission": "manager",
+      "permissionLabel": "Manage Server",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "type": 1,
+          "name": "add",
+          "description": "Create or replace a rule.",
+          "options": [
+            {
+              "type": 3,
+              "name": "name",
+              "description": "Short name, e.g. no-crypto",
+              "required": true,
+              "max_length": 64
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Words (whole words, comma separated)",
+                  "value": "keywords"
+                },
+                {
+                  "name": "Text anywhere (comma separated)",
+                  "value": "keywords_anywhere"
+                },
+                {
+                  "name": "Regular expression",
+                  "value": "regex"
+                },
+                {
+                  "name": "Link domains (comma separated)",
+                  "value": "domains"
+                },
+                {
+                  "name": "File extensions (comma separated)",
+                  "value": "attachments"
+                },
+                {
+                  "name": "Mentions over N",
+                  "value": "mentions"
+                },
+                {
+                  "name": "Message longer than N",
+                  "value": "length"
+                }
+              ],
+              "name": "trigger",
+              "description": "What the rule looks for",
+              "required": true
+            },
+            {
+              "type": 3,
+              "name": "value",
+              "description": "Words, regex, domains, extensions or number",
+              "required": true,
+              "max_length": 1000
+            },
+            {
+              "type": 3,
+              "name": "reason",
+              "description": "Shown to members and in logs",
+              "required": true,
+              "max_length": 200
+            },
+            {
+              "max_value": 5,
+              "min_value": 1,
+              "type": 4,
+              "name": "severity",
+              "description": "1–5 (risk points), default 3",
+              "required": false
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "None (only delete / add risk)",
+                  "value": "none"
+                },
+                {
+                  "name": "Warn",
+                  "value": "warn"
+                },
+                {
+                  "name": "Timeout",
+                  "value": "timeout"
+                },
+                {
+                  "name": "Quarantine",
+                  "value": "quarantine"
+                },
+                {
+                  "name": "Remove roles",
+                  "value": "strip_roles"
+                },
+                {
+                  "name": "Kick",
+                  "value": "kick"
+                },
+                {
+                  "name": "Softban (kick + delete messages)",
+                  "value": "softban"
+                },
+                {
+                  "name": "Ban",
+                  "value": "ban"
+                }
+              ],
+              "name": "action",
+              "description": "Immediate action",
+              "required": false
+            },
+            {
+              "type": 3,
+              "name": "duration",
+              "description": "Timeout length, e.g. 1h",
+              "required": false
+            },
+            {
+              "name": "delete",
+              "description": "Delete the message (default yes)",
+              "required": false,
+              "type": 5
+            },
+            {
+              "name": "channel",
+              "description": "Only apply in this channel",
+              "required": false,
+              "type": 7
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "remove",
+          "description": "Delete a rule.",
+          "options": [
+            {
+              "autocomplete": true,
+              "type": 3,
+              "name": "name",
+              "description": "Rule",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "toggle",
+          "description": "Enable or disable a rule.",
+          "options": [
+            {
+              "autocomplete": true,
+              "type": 3,
+              "name": "name",
+              "description": "Rule",
+              "required": true
+            },
+            {
+              "name": "enabled",
+              "description": "On or off",
+              "required": true,
+              "type": 5
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "list",
+          "description": "Show all rules.",
+          "options": []
+        }
+      ],
+      "name": "policy",
+      "description": "Custom server rules for AutoMod.",
+      "default_member_permissions": "32",
+      "type": 1
+    },
+    {
+      "module": "automod",
+      "permission": "manager",
+      "permissionLabel": "Manage Server",
+      "subcommandPermissions": {
+        "key": "extra_owner",
+        "remove": "extra_owner"
+      },
+      "options": [
+        {
+          "type": 1,
+          "name": "key",
+          "description": "Set your provider and API key (stored encrypted).",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Anthropic (Claude)",
+                  "value": "anthropic"
+                },
+                {
+                  "name": "OpenAI (Moderation API)",
+                  "value": "openai"
+                },
+                {
+                  "name": "OpenAI-compatible (OpenRouter, Groq, local…)",
+                  "value": "openai_compatible"
+                },
+                {
+                  "name": "Google Gemini",
+                  "value": "gemini"
+                }
+              ],
+              "name": "provider",
+              "description": "AI provider",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "status",
+          "description": "Show AI settings and usage.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "settings",
+          "description": "How and when AI analysis runs.",
+          "options": [
+            {
+              "name": "enabled",
+              "description": "Turn AI analysis on/off",
+              "required": false,
+              "type": 5
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Borderline only (recommended, cheap)",
+                  "value": "borderline"
+                },
+                {
+                  "name": "Every message (costly)",
+                  "value": "all"
+                }
+              ],
+              "name": "mode",
+              "description": "Which messages are analysed",
+              "required": false
+            },
+            {
+              "max_value": 1,
+              "min_value": 0.1,
+              "type": 10,
+              "name": "threshold",
+              "description": "Min confidence 0.1–1 (default 0.8)",
+              "required": false
+            },
+            {
+              "max_value": 1000000,
+              "min_value": 0,
+              "type": 4,
+              "name": "monthly_limit",
+              "description": "Max requests per month",
+              "required": false
+            },
+            {
+              "max_value": 600,
+              "min_value": 1,
+              "type": 4,
+              "name": "per_minute",
+              "description": "Max requests per minute",
+              "required": false
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "test",
+          "description": "Send a test message to your AI provider.",
+          "options": [
+            {
+              "type": 3,
+              "name": "text",
+              "description": "Text to classify",
+              "required": true,
+              "max_length": 1000
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "remove",
+          "description": "Delete the stored API key.",
+          "options": []
+        }
+      ],
+      "name": "ai",
+      "description": "AI analysis with your own API key.",
+      "default_member_permissions": "32",
+      "type": 1
+    },
+    {
+      "module": "risk",
+      "permission": "moderator",
+      "permissionLabel": "Moderator",
+      "subcommandPermissions": {
+        "ladder-set": "manager",
+        "ladder-remove": "manager",
+        "settings": "manager",
+        "reset": "moderator"
+      },
+      "options": [
+        {
+          "type": 1,
+          "name": "view",
+          "description": "Show a member's risk score.",
+          "options": [
+            {
+              "name": "user",
+              "description": "Member",
+              "required": true,
+              "type": 6
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "reset",
+          "description": "Reset a member's risk score to 0.",
+          "options": [
+            {
+              "name": "user",
+              "description": "Member",
+              "required": true,
+              "type": 6
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "top",
+          "description": "Members with the highest risk.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "ladder",
+          "description": "Show the escalation ladder.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "ladder-set",
+          "description": "Add or change a ladder step.",
+          "options": [
+            {
+              "max_value": 10000,
+              "min_value": 1,
+              "type": 4,
+              "name": "threshold",
+              "description": "Risk score",
+              "required": true
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "None (only delete / add risk)",
+                  "value": "none"
+                },
+                {
+                  "name": "Warn",
+                  "value": "warn"
+                },
+                {
+                  "name": "Timeout",
+                  "value": "timeout"
+                },
+                {
+                  "name": "Quarantine",
+                  "value": "quarantine"
+                },
+                {
+                  "name": "Remove roles",
+                  "value": "strip_roles"
+                },
+                {
+                  "name": "Kick",
+                  "value": "kick"
+                },
+                {
+                  "name": "Softban (kick + delete messages)",
+                  "value": "softban"
+                },
+                {
+                  "name": "Ban",
+                  "value": "ban"
+                }
+              ],
+              "name": "action",
+              "description": "Action",
+              "required": true
+            },
+            {
+              "type": 3,
+              "name": "duration",
+              "description": "Timeout length, e.g. 1h",
+              "required": false
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "ladder-remove",
+          "description": "Remove a ladder step.",
+          "options": [
+            {
+              "type": 4,
+              "name": "threshold",
+              "description": "Step threshold",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "settings",
+          "description": "Tune scoring.",
+          "options": [
+            {
+              "name": "enabled",
+              "description": "Risk Engine on/off",
+              "required": false,
+              "type": 5
+            },
+            {
+              "max_value": 2160,
+              "min_value": 1,
+              "type": 10,
+              "name": "half_life_hours",
+              "description": "Hours until a score halves (default 24)",
+              "required": false
+            },
+            {
+              "max_value": 5,
+              "min_value": 1,
+              "type": 10,
+              "name": "repeat_multiplier",
+              "description": "Multiplier for quick repeats (default 1.5)",
+              "required": false
+            },
+            {
+              "max_value": 365,
+              "min_value": 1,
+              "type": 4,
+              "name": "warn_expiry_days",
+              "description": "Days until warnings expire",
+              "required": false
+            }
+          ]
+        }
+      ],
+      "name": "risk",
+      "description": "Risk Engine: decaying scores and the escalation ladder.",
+      "default_member_permissions": "1099511627776",
+      "type": 1
+    }
+  ]
+}

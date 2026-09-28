@@ -6,8 +6,11 @@ import { randomInt } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createDb, type DbHandle } from '../src/client.js';
 import { runMigrations } from '../src/migrate.js';
+import * as automodRepo from '../src/repositories/automod.js';
+import * as banRepo from '../src/repositories/bans.js';
 import * as caseRepo from '../src/repositories/cases.js';
 import * as guildRepo from '../src/repositories/guilds.js';
+import * as riskRepo from '../src/repositories/risk.js';
 import * as trustRepo from '../src/repositories/trust.js';
 
 const url = process.env.TEST_DATABASE_URL;
@@ -97,5 +100,75 @@ suite('db repositories (integration)', () => {
     expect(rows).toHaveLength(2);
     expect(rows.find((r) => r.kind === 'whitelist')?.permissions).toEqual(['channel_create']);
     expect(await trustRepo.clearWhitelist(handle.db, guildId)).toBe(1);
+  });
+
+  it('stores custom words, policies, AI credentials and risk scores', async () => {
+    const guildId = fakeId();
+    const user = fakeId();
+    await automodRepo.addCustomWord(handle.db, {
+      guildId,
+      term: 'badword',
+      match: 'boundary',
+      severity: 3,
+      createdBy: user,
+    });
+    await automodRepo.addCustomWord(handle.db, {
+      guildId,
+      term: 'badword',
+      match: 'substring',
+      severity: 4,
+      createdBy: user,
+    });
+    const words = await automodRepo.listCustomWords(handle.db, guildId);
+    expect(words).toHaveLength(1);
+    expect(words[0]).toMatchObject({ match: 'substring', severity: 4 });
+
+    await automodRepo.upsertPolicy(handle.db, {
+      guildId,
+      name: 'no-exe',
+      definition: { a: 1 },
+      createdBy: user,
+    });
+    expect(await automodRepo.setPolicyEnabled(handle.db, guildId, 'no-exe', false)).toBe(true);
+    expect((await automodRepo.listPolicies(handle.db, guildId))[0]?.enabled).toBe(false);
+
+    await automodRepo.saveAiCredential(handle.db, {
+      guildId,
+      provider: 'anthropic',
+      model: 'claude-opus-5',
+      baseUrl: null,
+      apiKeyEnc: 'v1.x.y.z',
+      createdBy: user,
+    });
+    expect((await automodRepo.getAiCredential(handle.db, guildId))?.model).toBe('claude-opus-5');
+
+    await riskRepo.saveRisk(handle.db, {
+      guildId,
+      userId: user,
+      score: 12.5,
+      lastStepThreshold: 10,
+      lastViolationAt: new Date(),
+    });
+    await riskRepo.saveRisk(handle.db, {
+      guildId,
+      userId: user,
+      score: 30,
+      lastStepThreshold: 25,
+      lastViolationAt: new Date(),
+    });
+    expect((await riskRepo.getRisk(handle.db, guildId, user))?.score).toBe(30);
+    expect((await riskRepo.topRisk(handle.db, guildId)).length).toBe(1);
+  });
+
+  it('mirrors bans', async () => {
+    const guildId = fakeId();
+    const a = fakeId();
+    const b = fakeId();
+    await banRepo.recordBan(handle.db, { guildId, userId: a, reason: 'spam', moderatorId: null });
+    expect(await banRepo.bannedAmong(handle.db, guildId, [a, b])).toEqual([a]);
+    await banRepo.replaceGuildBans(handle.db, guildId, [{ userId: b, reason: null }]);
+    expect(await banRepo.bannedAmong(handle.db, guildId, [a, b])).toEqual([b]);
+    await banRepo.removeBan(handle.db, guildId, b);
+    expect(await banRepo.bannedAmong(handle.db, guildId, [a, b])).toEqual([]);
   });
 });

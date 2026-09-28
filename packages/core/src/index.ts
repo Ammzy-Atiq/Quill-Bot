@@ -1,7 +1,14 @@
 /**
  * @quill/core — QUILL GUARD's framework-free engine. Runs in Node and in browsers.
  */
+export {
+  OFFICIAL_DOMAINS,
+  PROTECTED_BRANDS,
+  SCAM_PHRASES,
+  SEED_SCAM_DOMAINS,
+} from './data/scam.js';
 export { builtinWordlist, WORDLIST_SOURCES } from './data/wordlists/index.js';
+export * from './detectors/index.js';
 export { type AcMatch, AhoCorasick } from './matcher/aho-corasick.js';
 export { type MatchOptions, type WordHit, WordMatcher } from './matcher/word-matcher.js';
 export {

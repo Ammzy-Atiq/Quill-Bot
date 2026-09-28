@@ -9,9 +9,14 @@ import { routeInteraction } from './framework/router.js';
 import type { BotModule } from './framework/types.js';
 import type { KeyValueStore } from './lib/store.js';
 import type { Logger } from './logger.js';
+import { AiService } from './modules/automod/ai/service.js';
+import { AutomodData } from './modules/automod/data.js';
+import { AutomodService } from './modules/automod/service.js';
 import { CaseService } from './services/cases.js';
 import { GuildConfigService } from './services/guild-config.js';
 import { LogService } from './services/logs.js';
+import { ModerationService } from './services/moderation.js';
+import { RiskService } from './services/risk.js';
 import { TrustService } from './services/trust.js';
 
 const FALLBACK_LOGO = 'https://cdn.discordapp.com/embed/avatars/0.png';
@@ -32,6 +37,11 @@ export class App {
   readonly trust: TrustService;
   readonly logs: LogService;
   readonly cases: CaseService;
+  readonly moderation: ModerationService;
+  readonly risk: RiskService;
+  readonly automodData: AutomodData;
+  readonly automod: AutomodService;
+  readonly ai: AiService;
 
   constructor(
     readonly env: Env,
@@ -47,6 +57,11 @@ export class App {
     this.trust = new TrustService(this);
     this.logs = new LogService(this);
     this.cases = new CaseService(this);
+    this.moderation = new ModerationService(this);
+    this.risk = new RiskService(this);
+    this.automodData = new AutomodData(this);
+    this.automod = new AutomodService(this);
+    this.ai = new AiService(this);
   }
 
   /** Thumbnail used on QUILL cards: BRAND_LOGO_URL, else the bot avatar. */
@@ -65,6 +80,7 @@ export class App {
   async start(): Promise<void> {
     await this.configs.init();
     await this.trust.init();
+    await this.automodData.init();
     for (const module of this.registry.modules) await module.init?.(this);
 
     for (const handler of this.registry.events) {

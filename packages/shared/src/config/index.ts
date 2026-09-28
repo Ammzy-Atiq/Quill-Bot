@@ -14,6 +14,7 @@ export * from './common.js';
 export * from './logging.js';
 export * from './messages.js';
 export * from './paths.js';
+export * from './policies.js';
 export * from './risk.js';
 export * from './verification.js';
 

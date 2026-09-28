@@ -39,7 +39,7 @@ Legend: ✅ done · 🚧 in progress · ⏳ planned. Owners: **bot-agent** (this
 | Bot framework (sharding, router, permissions, V2 UI kit) | ✅ | bot-agent | |
 | `/help` `/about` `/ping` `/setup` `/logs` `/case` | ✅ | bot-agent | |
 | Core engine: normalizer, 2800+ word lists, matcher, risk engine, verification evaluator | ✅ | bot-agent | `evaluateVerification` / `scoreIdentityLink` ready for the website |
-| AutoMod module (detectors, BYOK AI, policies, templates) | ⏳ | bot-agent | Phase 3 |
+| AutoMod module (detectors, BYOK AI, policies, templates, risk ladder) | ✅ | bot-agent | `/automod` `/policy` `/ai` `/risk`, log cards with moderator buttons |
 | Anti-Nuke + Anti-Raid + snapshots/recovery + worker jobs | ⏳ | bot-agent | Phase 4 |
 | Verification (bot side), SSO, evasion, member backup job | ⏳ | bot-agent | Phase 5 |
 | Moderation commands, `/messages`, native AutoMod sync | ⏳ | bot-agent | Phase 6 |
@@ -219,6 +219,25 @@ webhook_delete emoji_delete integration_create automod_rule_delete mention_every
 `{ title, body, footer, showThumbnail, imageUrl }` with variables `{user} {user.name} {user.id}
 {server} {server.id}` plus per-template ones (`TEMPLATE_VARIABLES`). Defaults: `DEFAULT_TEMPLATES`.
 
+### AutoMod pipeline (implemented)
+`messageCreate`/`messageUpdate` → exemptions (users, roles, channels/categories, Manage Messages
+bypass, owner) → `normalize()` → `runDetectors()` from `@quill/core` (words, spam, links, scam,
+harassment, toxicity, custom policies) → optional **BYOK AI** second opinion (borderline messages
+by default) → shadow-mode split → delete → **Risk Engine** (`evaluateRisk`) → strongest of
+{detector immediate action, ladder step} executed by `ModerationService` (hierarchy-checked) →
+case + DM (template) + short channel notice + AutoMod log card with History / Remove timeout /
+Reset risk / Ban buttons. Burst protection: one full enforcement per member+reason per 4 s.
+
+**Default risk ladder:** 10 warn · 25 timeout 10m · 45 timeout 1h · 70 timeout 1d · 110 ban.
+Severity points 3/6/12/25/45; extra violations in the same message add 25%; repeats within
+10 min ×1.5; half-life 24 h.
+
+**BYOK AI** (`apps/bot/src/modules/automod/ai/`): Anthropic via the official `@anthropic-ai/sdk`
+(default model `claude-opus-5`, structured JSON output, low effort, server-side refusal
+fallbacks `fallbacks: "default"`; servers can pick a cheaper model such as `claude-haiku-4-5`),
+OpenAI Moderation endpoint (`omni-moderation-latest`), any OpenAI-compatible API, Google Gemini.
+Keys are AES-256-GCM encrypted in `ai_credentials`, per-minute + monthly caps in Redis.
+
 ---
 
 ## 8. Bot ↔ Website contracts
@@ -285,6 +304,16 @@ overwrite); put the QUILL role at the top of the role list; add the website's OA
 ---
 
 ## 11. Changelog
+
+- **Phase 3 — AutoMod** (bot-agent): core detectors (words with evasion bump, spam incl.
+  cross-channel blasts, links/invites incl. obfuscated invites and masked links, scams with
+  phishing/look-alike/homograph domains + scam phrases + perceptual image hashes + compromised
+  account signals, harassment incl. targeting/threats/doxxing, toxicity, custom policies);
+  bot pipeline + `ModerationService` + `RiskService` (Redis + Postgres); BYOK AI (Anthropic SDK,
+  OpenAI moderation, OpenAI-compatible, Gemini); commands `/automod` (panel, test, toggle, shadow,
+  response, normalizer, spam, words…, exempt…, links…, scam…), `/policy`, `/ai`, `/risk`;
+  `guild_bans` mirror; end-to-end flow test against Postgres. Default risk ladder softened
+  (timeouts before ban). `commands.manifest.json` regenerated.
 
 - **Phase 2 — Core engine** (bot-agent): `normalize()` (NFKC, invisible chars, Zalgo/diacritics,
   homoglyphs incl. Cyrillic/Greek/emoji letters/small caps/upside-down, context-aware leetspeak,

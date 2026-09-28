@@ -17,7 +17,7 @@ import { reply, update } from '../../ui/respond.js';
 
 const PAGE_SIZE = 8;
 
-async function casesPage(app: App, guildId: string, viewerId: string, userId: string, page: number) {
+export async function casesPage(app: App, guildId: string, viewerId: string, userId: string, page: number) {
   const [rows, total, warnings] = await Promise.all([
     caseRepo.listUserCases(app.db, guildId, userId, { limit: PAGE_SIZE, offset: page * PAGE_SIZE }),
     caseRepo.countUserCases(app.db, guildId, userId),

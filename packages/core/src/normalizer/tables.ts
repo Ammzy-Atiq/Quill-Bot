@@ -104,12 +104,9 @@ export const LEET_DIGITS = new Set(['0', '1', '3', '4', '5', '6', '7', '8', '9']
  * word joiner & invisible operators, bidi controls, BOM, variation selectors, Hangul fillers,
  * braille blank, tag characters, interlinear annotations.
  */
-// Built from a string: the class intentionally lists combining characters (CGJ, Khmer
-// inherent vowels, variation selectors) that are removed one by one.
-export const INVISIBLE_RE = new RegExp(
-  '[\\u00AD\\u034F\\u061C\\u115F\\u1160\\u17B4\\u17B5\\u180B-\\u180F\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u206F\\u2800\\u3164\\uFE00-\\uFE0F\\uFEFF\\uFFA0\\uFFF9-\\uFFFB\\u{E0000}-\\u{E007F}\\u{E0100}-\\u{E01EF}]',
-  'gu',
-);
+export const INVISIBLE_RE =
+  // biome-ignore lint/suspicious/noMisleadingCharacterClass: each code point (CGJ, Khmer inherent vowels, variation selectors) is removed on its own, never combined
+  /[\u00AD\u034F\u061C\u115F\u1160\u17B4\u17B5\u180B-\u180F\u200B-\u200F\u202A-\u202E\u2060-\u206F\u2800\u3164\uFE00-\uFE0F\uFEFF\uFFA0\uFFF9-\uFFFB\u{E0000}-\u{E007F}\u{E0100}-\u{E01EF}]/gu;
 
 /** Combining marks (diacritics, Zalgo). */
 export const COMBINING_RE = /\p{M}/gu;

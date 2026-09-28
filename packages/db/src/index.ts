@@ -1,7 +1,10 @@
 export * from './client.js';
 export { MIGRATIONS_FOLDER, runMigrations } from './migrate.js';
+export * as automodRepo from './repositories/automod.js';
+export * as banRepo from './repositories/bans.js';
 export * as cases from './repositories/cases.js';
 export * as guildRepo from './repositories/guilds.js';
 export { ConfigVersionConflictError } from './repositories/guilds.js';
+export * as riskRepo from './repositories/risk.js';
 export * as trust from './repositories/trust.js';
 export * as schema from './schema/index.js';

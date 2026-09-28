@@ -12,8 +12,8 @@ export const DEFAULT_RISK_LADDER: RiskLadderStep[] = [
   { threshold: 10, action: { type: 'warn' } },
   { threshold: 25, action: { type: 'timeout', durationSeconds: 10 * 60 } },
   { threshold: 45, action: { type: 'timeout', durationSeconds: 60 * 60 } },
-  { threshold: 70, action: { type: 'kick' } },
-  { threshold: 100, action: { type: 'ban', deleteMessageSeconds: 24 * 60 * 60 } },
+  { threshold: 70, action: { type: 'timeout', durationSeconds: 24 * 60 * 60 } },
+  { threshold: 110, action: { type: 'ban', deleteMessageSeconds: 24 * 60 * 60 } },
 ];
 
 export const RiskConfigSchema = z
@@ -33,7 +33,7 @@ export const RiskConfigSchema = z
     /** Warnings stop counting after this many days. */
     warnExpiryDays: z.number().int().min(1).max(365).default(30),
     /** Base points per violation severity (index 0 = severity 1). */
-    severityPoints: z.array(z.number().min(0).max(1000)).length(5).default([3, 6, 12, 25, 50]),
+    severityPoints: z.array(z.number().min(0).max(1000)).length(5).default([3, 6, 12, 25, 45]),
     /** Repeat offences within this window multiply points. */
     repeatWindowMinutes: z.number().int().min(1).max(1440).default(10),
     repeatMultiplier: z.number().min(1).max(5).default(1.5),

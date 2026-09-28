@@ -68,14 +68,15 @@ export function trustMultiplier(ctx: RiskContext, config: RiskConfig): number {
 }
 
 /**
- * Points for one message: the strongest violation counts fully, every additional
- * violation in the same message counts half (three slurs ≠ three separate offences).
+ * Points for one message: the strongest violation counts fully, every additional violation in
+ * the same message adds 25% (one slur aimed at someone trips both the word filter and the
+ * harassment detector — that is one offence, not two).
  */
 export function basePoints(violations: readonly RiskViolation[], config: RiskConfig): number {
   const points = violations
     .map((v) => (config.severityPoints[v.severity - 1] ?? 0) * v.pointsMultiplier)
     .sort((a, b) => b - a);
-  return points.reduce((sum, p, i) => sum + (i === 0 ? p : p / 2), 0);
+  return points.reduce((sum, p, i) => sum + (i === 0 ? p : p * 0.25), 0);
 }
 
 /**

@@ -32,9 +32,9 @@ describe('risk engine', () => {
     expect(d.state.lastStepThreshold).toBe(10);
   });
 
-  it('counts extra violations in one message at half value', () => {
+  it('counts extra violations in one message at a quarter value', () => {
     const now = Date.UTC(2026, 0, 1);
-    expect(evaluateRisk(null, [v(3), v(3), v(3)], config, ctx(now)).added).toBe(24);
+    expect(evaluateRisk(null, [v(3), v(3), v(3)], config, ctx(now)).added).toBe(18);
   });
 
   it('escalates with repeat offences and does not repeat a step', () => {
@@ -51,8 +51,10 @@ describe('risk engine', () => {
 
   it('jumps straight to the highest crossed step', () => {
     const now = Date.UTC(2026, 0, 1);
-    const d = evaluateRisk(null, [v(5, 2)], config, ctx(now)); // 100 points
+    const d = evaluateRisk(null, [v(5, 3)], config, ctx(now)); // 135 points
     expect(d.step?.action.type).toBe('ban');
+    const e = evaluateRisk(null, [v(5, 2)], config, ctx(now)); // 90 points
+    expect(e.step?.action).toEqual({ type: 'timeout', durationSeconds: 86_400 });
   });
 
   it('re-arms steps after the score decays', () => {
