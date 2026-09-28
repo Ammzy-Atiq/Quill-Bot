@@ -42,8 +42,8 @@ Legend: ✅ done · 🚧 in progress · ⏳ planned. Owners: **bot-agent** (this
 | AutoMod module (detectors, BYOK AI, policies, templates, risk ladder) | ✅ | bot-agent | `/automod` `/policy` `/ai` `/risk`, log cards with moderator buttons |
 | Anti-Nuke + Anti-Raid engine (`packages/core`) | ✅ | bot-agent | trust model, strict/threshold, threat scoring, anti-betray, 8 red-team scenarios, join evaluation |
 | Anti-Nuke + Anti-Raid services (`apps/bot`) | ✅ | bot-agent | audit-log mapping, punish, revert (incl. retroactive), live incident cards, emergency mode, snapshots + restore, raid mode |
-| Anti-Nuke commands + events (`/antinuke /whitelist /extraowner /emergency /backup /antiraid /incident`) | 🚧 | bot-agent | Phase 4 — in progress |
-| Shared verification repository (`verificationRepo` in `packages/db`) | ⏳ | bot-agent | Next after Phase 4; signatures in `apps/website/AGENTS.md` §6 |
+| Anti-Nuke commands + events (`/antinuke /whitelist /extraowner /emergency /backup /antiraid /incident`) | ✅ | bot-agent | panel, audit, red-team simulate, whitelist panel, confirmations, live incident buttons, snapshot restore with progress |
+| Shared verification repository (`verificationRepo` in `packages/db`) | ⏳ | bot-agent | **Next**; signatures in `apps/website/AGENTS.md` §6 |
 | Verification (bot side), SSO, evasion, member backup job | ⏳ | bot-agent | Phase 5 |
 | Moderation commands, `/messages`, native AutoMod sync | ⏳ | bot-agent | Phase 6 |
 | Website (landing, verify flow, OAuth, fingerprint, dashboard) | ⏳ ready to start | website-agent | Spec: `apps/website/AGENTS.md` — begin with §0 *Start here* |
@@ -134,7 +134,10 @@ that runs them (tsx, Vitest, tsup, Next.js `transpilePackages`) compiles them on
    shard drops its cache.
 
 **Scaling model:** shards are stateless apart from caches. Postgres = durable state; Redis = rate
-windows, risk hot copies, pub/sub, BullMQ. The worker uses REST only. Start with
+windows, risk hot copies, pub/sub, BullMQ. The worker uses REST only. Anti-Nuke state that must be
+exact per burst (decision queue, live incidents, deleted-object copies) lives in the shard that owns
+the guild — every guild event reaches the same shard — and is persisted to Postgres as it changes.
+Snapshot restores also run in that shard (they need the live cache and old → new id mapping). Start with
 `ShardingManager` (process per shard); the design allows clustered sharding later.
 
 ---
@@ -393,7 +396,7 @@ overwrite); put the QUILL role at the top of the role list; add the website's OA
   `pnpm verify:link`, `@quill/core` subpath exports (`/normalizer`, `/verification`, `/antinuke`,
   `sideEffects: false`) and the `apps/website/**/*.test.ts` Vitest glob.
 
-- **Phase 4 — Anti-Nuke + Anti-Raid** (bot-agent, 🚧 in progress): core engine (`resolveTrust`,
+- **Phase 4 — Anti-Nuke + Anti-Raid** (bot-agent, ✅): core engine (`resolveTrust`,
   `evaluateAntiNuke` strict/threshold with anti-betray + raid tightening, `assessThreat` with combo
   multipliers, 8 red-team `SCENARIOS` + `simulate()`, `evaluateJoin`); `securityRepo` (incidents,
   security events, snapshots, emergency state); bot services: audit-log mapping, `AntiNukeService`
@@ -401,7 +404,15 @@ overwrite); put the QUILL role at the top of the role list; add the website's OA
   owner DM fallback, webhook @everyone spam), `Reverter` (unban, re-create channels/roles/emojis/
   AutoMod rules from cache → snapshot → audit data, roll back guild/channel/role/webhook edits,
   re-point config ids), `EmergencyService`, `SnapshotService` (scheduler + restore),
-  `AntiRaidService` (join filters, raid mode, wave sweep). Commands and events next.
+  `AntiRaidService` (join filters, raid mode, wave sweep). Commands: `/antinuke` (panel, enable,
+  disable, mode, punishment, module, settings, protect, audit, simulate), `/whitelist` (Olympus-style
+  per-action select + "All"), `/extraowner` (owner only, confirmed), `/emergency` (authorized users
+  may start, only owners end), `/backup` (create, list, view, restore with safety snapshot +
+  progress, delete), `/incident` (list, view, resolve + card buttons: ban, unban, give roles back,
+  full log, resolve), `/antiraid`. Ban mirror syncs on join; initial snapshot on join. Tests:
+  mapping, UI limits, and an end-to-end flow against Postgres (strict, threshold + retroactive
+  revert, anti-betray + auto emergency, emergency strip/restore). Manifest regenerated
+  (17 commands); Biome ignores the generated manifest.
 
 - **Phase 3 — AutoMod** (bot-agent): core detectors (words with evasion bump, spam incl.
   cross-channel blasts, links/invites incl. obfuscated invites and masked links, scams with

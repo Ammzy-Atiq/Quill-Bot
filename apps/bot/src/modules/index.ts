@@ -1,4 +1,6 @@
 import type { BotModule } from '../framework/types.js';
+import { antinukeModule } from './antinuke/index.js';
+import { antiraidModule } from './antiraid/index.js';
 import { automodModule } from './automod/index.js';
 import { casesModule } from './cases/index.js';
 import { coreModule } from './core/index.js';
@@ -16,4 +18,6 @@ export const MODULES: BotModule[] = [
   loggingModule,
   { ...casesModule, events: [...(casesModule.events ?? []), ...banMirrorEvents] },
   automodModule,
+  antinukeModule,
+  antiraidModule,
 ];

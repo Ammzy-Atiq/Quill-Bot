@@ -56,7 +56,7 @@
 | Bot "Verify" button that sends members to your site | ⏳ bot Phase 5 | meanwhile: `pnpm verify:link <guildId> <userId>` (§0.4) |
 | Bot applies `quill:verification:completed` (roles / review card / block) | ⏳ bot Phase 5 | meanwhile watch the channel (§0.4) — build against the contract |
 | Bot applies `quill:verification:review` decisions | ⏳ bot Phase 5 | same |
-| Anti-Nuke / Anti-Raid data (incidents, security events, snapshots, emergency state) | 🚧 bot Phase 4 — tables and formats are final | root `AGENTS.md` §7 |
+| Anti-Nuke / Anti-Raid data (incidents, security events, snapshots, emergency state) | ✅ | formats in root `AGENTS.md` §7 |
 
 ### 0.3 Ownership & parallel-work rules
 

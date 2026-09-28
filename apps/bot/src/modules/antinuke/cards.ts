@@ -108,7 +108,7 @@ export function incidentCard(
         'Threat',
         `${THREAT_EMOJI[view.threatLevel]} ${capitalize(view.threatLevel)} · score ${s.threatScore}`,
       ],
-      ['Actions', formatCounts(s.counts) || '—'],
+      ['Actions', truncate(formatCounts(s.counts), 400) || '—'],
       ['Punishment', punishment],
       [
         'Recovery',
@@ -133,7 +133,7 @@ export function incidentCard(
     card
       .divider()
       .text(
-        `**Timeline**\n${s.timeline.map((e) => `<t:${Math.floor(e.at / 1000)}:T> ${truncate(e.text, 170)}`).join('\n')}`,
+        `**Timeline**\n${s.timeline.map((e) => `<t:${Math.floor(e.at / 1000)}:T> ${truncate(e.text, 140)}`).join('\n')}`,
       );
   }
   if (s.notes.length > 0) card.text(s.notes.map((n) => `-# ${n}`).join('\n'));

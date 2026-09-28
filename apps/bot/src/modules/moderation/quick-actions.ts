@@ -106,4 +106,23 @@ export const banMirrorEvents: EventHandler[] = [
       await banRepo.removeBan(app.db, ban.guild.id, ban.user.id);
     },
   }),
+  defineEvent({
+    event: 'guildCreate',
+    async execute(app, guild) {
+      // Initial mirror of existing bans (paged, up to 10k) so evasion checks work from day one.
+      if (!guild.members.me?.permissions.has(PermissionFlagsBits.BanMembers)) return;
+      const bans: Array<{ userId: string; reason: string | null }> = [];
+      let after: string | undefined;
+      for (let page = 0; page < 10; page++) {
+        const batch = await guild.bans
+          .fetch({ limit: 1000, ...(after ? { after } : {}), cache: false })
+          .catch(() => null);
+        if (!batch || batch.size === 0) break;
+        for (const ban of batch.values()) bans.push({ userId: ban.user.id, reason: ban.reason ?? null });
+        if (batch.size < 1000) break;
+        after = batch.lastKey();
+      }
+      await banRepo.replaceGuildBans(app.db, guild.id, bans);
+    },
+  }),
 ];

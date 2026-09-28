@@ -420,6 +420,7 @@ export class AntiNukeService {
         details: { incident: incident.number, threat: decision.threat.score },
       });
       record.ok = result.ok;
+      if (result.ok && incident.status === 'open') incident.status = 'contained';
       record.error = result.error ?? null;
       record.caseNumber = result.caseRow?.caseNumber ?? null;
       if (result.applied && result.applied !== action.type)
@@ -602,7 +603,9 @@ export class AntiNukeService {
     if (incident.ownerNotified) return;
     incident.ownerNotified = true;
     const owner = await guild.fetchOwner().catch(() => null);
-    await owner?.send(v2Message(incidentCard(this.app, incident, { dm: true }))).catch(() => undefined);
+    await owner
+      ?.send(v2Message(incidentCard(this.app, incident, { dm: true, guildName: guild.name })))
+      .catch(() => undefined);
   }
 
   /** Closes idle incidents and forgets old actor windows. */
@@ -618,8 +621,8 @@ export class AntiNukeService {
       if (incident.status === 'open') {
         const punishment = incident.summary.punishment;
         incident.status = !punishment ? 'resolved' : punishment.ok ? 'contained' : 'open';
-        if (incident.status !== 'open') incident.endedAt = new Date();
       }
+      if (incident.status !== 'open') incident.endedAt ??= new Date();
       pushTimeline(incident.summary, `${E.clock} No further activity — incident closed`);
       if (incident.flushTimer) clearTimeout(incident.flushTimer);
       incident.flushTimer = null;

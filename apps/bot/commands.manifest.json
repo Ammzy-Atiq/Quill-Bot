@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-28T09:55:17.817Z",
+  "generatedAt": "2026-09-28T10:44:23.098Z",
   "commands": [
     {
       "module": "general",
@@ -94,7 +94,10 @@
               "required": true
             },
             {
-              "channel_types": [0, 5],
+              "channel_types": [
+                0,
+                5
+              ],
               "name": "channel",
               "description": "Channel to post in",
               "required": true,
@@ -815,7 +818,12 @@
               "description": "Exempt a channel or category.",
               "options": [
                 {
-                  "channel_types": [0, 4, 5, 15],
+                  "channel_types": [
+                    0,
+                    4,
+                    5,
+                    15
+                  ],
                   "name": "channel",
                   "description": "Channel",
                   "required": true,
@@ -1441,6 +1449,1014 @@
       "name": "risk",
       "description": "Risk Engine: decaying scores and the escalation ladder.",
       "default_member_permissions": "1099511627776",
+      "type": 1
+    },
+    {
+      "module": "antinuke",
+      "permission": "extra_owner",
+      "permissionLabel": "Server owner or extra owner",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "type": 1,
+          "name": "panel",
+          "description": "Open the Anti-Nuke control panel.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "enable",
+          "description": "Turn Anti-Nuke on.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "disable",
+          "description": "Turn Anti-Nuke off.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "mode",
+          "description": "Strict (punish the first action) or threshold (punish above the limits).",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Strict — punish the first unwhitelisted action",
+                  "value": "strict"
+                },
+                {
+                  "name": "Threshold — punish above the limits",
+                  "value": "threshold"
+                }
+              ],
+              "name": "mode",
+              "description": "Detection mode",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "punishment",
+          "description": "What happens to attackers.",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Ban",
+                  "value": "ban"
+                },
+                {
+                  "name": "Kick",
+                  "value": "kick"
+                },
+                {
+                  "name": "Remove all roles",
+                  "value": "strip_roles"
+                },
+                {
+                  "name": "Quarantine",
+                  "value": "quarantine"
+                },
+                {
+                  "name": "Alert only",
+                  "value": "alert"
+                }
+              ],
+              "name": "punishment",
+              "description": "Punishment",
+              "required": true
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Member bans",
+                  "value": "ban"
+                },
+                {
+                  "name": "Member kicks",
+                  "value": "kick"
+                },
+                {
+                  "name": "Member prune",
+                  "value": "prune"
+                },
+                {
+                  "name": "Bot additions",
+                  "value": "bot_add"
+                },
+                {
+                  "name": "Server settings",
+                  "value": "guild_update"
+                },
+                {
+                  "name": "Vanity URL",
+                  "value": "vanity_update"
+                },
+                {
+                  "name": "Dangerous role grants",
+                  "value": "member_role_update"
+                },
+                {
+                  "name": "Member timeouts",
+                  "value": "member_timeout"
+                },
+                {
+                  "name": "Channel creation",
+                  "value": "channel_create"
+                },
+                {
+                  "name": "Channel deletion",
+                  "value": "channel_delete"
+                },
+                {
+                  "name": "Channel / permission edits",
+                  "value": "channel_update"
+                },
+                {
+                  "name": "Role creation",
+                  "value": "role_create"
+                },
+                {
+                  "name": "Role deletion",
+                  "value": "role_delete"
+                },
+                {
+                  "name": "Role edits",
+                  "value": "role_update"
+                },
+                {
+                  "name": "Webhook creation",
+                  "value": "webhook_create"
+                },
+                {
+                  "name": "Webhook edits",
+                  "value": "webhook_update"
+                },
+                {
+                  "name": "Webhook deletion",
+                  "value": "webhook_delete"
+                },
+                {
+                  "name": "Emoji / sticker deletion",
+                  "value": "emoji_delete"
+                },
+                {
+                  "name": "Integrations",
+                  "value": "integration_create"
+                },
+                {
+                  "name": "AutoMod rule deletion",
+                  "value": "automod_rule_delete"
+                },
+                {
+                  "name": "@everyone / @here",
+                  "value": "mention_everyone"
+                }
+              ],
+              "name": "action",
+              "description": "Only for this protected action (default: all)",
+              "required": false
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "module",
+          "description": "Tune one protected action.",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Member bans",
+                  "value": "ban"
+                },
+                {
+                  "name": "Member kicks",
+                  "value": "kick"
+                },
+                {
+                  "name": "Member prune",
+                  "value": "prune"
+                },
+                {
+                  "name": "Bot additions",
+                  "value": "bot_add"
+                },
+                {
+                  "name": "Server settings",
+                  "value": "guild_update"
+                },
+                {
+                  "name": "Vanity URL",
+                  "value": "vanity_update"
+                },
+                {
+                  "name": "Dangerous role grants",
+                  "value": "member_role_update"
+                },
+                {
+                  "name": "Member timeouts",
+                  "value": "member_timeout"
+                },
+                {
+                  "name": "Channel creation",
+                  "value": "channel_create"
+                },
+                {
+                  "name": "Channel deletion",
+                  "value": "channel_delete"
+                },
+                {
+                  "name": "Channel / permission edits",
+                  "value": "channel_update"
+                },
+                {
+                  "name": "Role creation",
+                  "value": "role_create"
+                },
+                {
+                  "name": "Role deletion",
+                  "value": "role_delete"
+                },
+                {
+                  "name": "Role edits",
+                  "value": "role_update"
+                },
+                {
+                  "name": "Webhook creation",
+                  "value": "webhook_create"
+                },
+                {
+                  "name": "Webhook edits",
+                  "value": "webhook_update"
+                },
+                {
+                  "name": "Webhook deletion",
+                  "value": "webhook_delete"
+                },
+                {
+                  "name": "Emoji / sticker deletion",
+                  "value": "emoji_delete"
+                },
+                {
+                  "name": "Integrations",
+                  "value": "integration_create"
+                },
+                {
+                  "name": "AutoMod rule deletion",
+                  "value": "automod_rule_delete"
+                },
+                {
+                  "name": "@everyone / @here",
+                  "value": "mention_everyone"
+                }
+              ],
+              "name": "action",
+              "description": "Protected action",
+              "required": true
+            },
+            {
+              "name": "enabled",
+              "description": "Protect this action",
+              "required": false,
+              "type": 5
+            },
+            {
+              "max_value": 100,
+              "min_value": 0,
+              "type": 4,
+              "name": "limit",
+              "description": "Allowed per window (threshold mode / anti-betray)",
+              "required": false
+            },
+            {
+              "max_value": 3600,
+              "min_value": 1,
+              "type": 4,
+              "name": "window",
+              "description": "Window in seconds",
+              "required": false
+            },
+            {
+              "name": "reset",
+              "description": "Reset this action to its defaults",
+              "required": false,
+              "type": 5
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "settings",
+          "description": "Revert, anti-betray, emergency and snapshot settings.",
+          "options": [
+            {
+              "name": "revert",
+              "description": "Undo destructive actions",
+              "required": false,
+              "type": 5
+            },
+            {
+              "name": "anti_betray",
+              "description": "Watch whitelisted users too",
+              "required": false,
+              "type": 5
+            },
+            {
+              "max_value": 20,
+              "min_value": 1,
+              "type": 10,
+              "name": "betray_multiplier",
+              "description": "Whitelisted users may do limit × this",
+              "required": false
+            },
+            {
+              "name": "monitor_extra_owners",
+              "description": "Anti-betray also watches extra owners",
+              "required": false,
+              "type": 5
+            },
+            {
+              "name": "auto_emergency",
+              "description": "Enter emergency mode automatically",
+              "required": false,
+              "type": 5
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Suspicious",
+                  "value": "suspicious"
+                },
+                {
+                  "name": "High",
+                  "value": "high"
+                },
+                {
+                  "name": "Critical",
+                  "value": "critical"
+                }
+              ],
+              "name": "emergency_level",
+              "description": "Threat level that triggers emergency mode",
+              "required": false
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Kicked",
+                  "value": "kick"
+                },
+                {
+                  "name": "Banned",
+                  "value": "ban"
+                }
+              ],
+              "name": "bot_add_action",
+              "description": "Bots added without permission are…",
+              "required": false
+            },
+            {
+              "name": "lock_channels",
+              "description": "Emergency mode locks text channels",
+              "required": false,
+              "type": 5
+            },
+            {
+              "name": "pause_invites",
+              "description": "Emergency mode pauses invites",
+              "required": false,
+              "type": 5
+            },
+            {
+              "max_value": 168,
+              "min_value": 0,
+              "type": 4,
+              "name": "snapshot_hours",
+              "description": "Automatic snapshot interval (0 = off)",
+              "required": false
+            },
+            {
+              "max_value": 50,
+              "min_value": 1,
+              "type": 4,
+              "name": "snapshot_keep",
+              "description": "Automatic snapshots to keep",
+              "required": false
+            },
+            {
+              "name": "quarantine_role",
+              "description": "Role used for quarantine",
+              "required": false,
+              "type": 8
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "protect",
+          "description": "Toggle a protected channel (touching it is always treated as dangerous).",
+          "options": [
+            {
+              "name": "channel",
+              "description": "Channel",
+              "required": true,
+              "type": 7
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "audit",
+          "description": "Security audit: how well can QUILL protect this server?",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "simulate",
+          "description": "Red-team test: replay an attack against your settings (dry run).",
+          "options": [
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "All scenarios",
+                  "value": "all"
+                },
+                {
+                  "name": "Mass channel deletion",
+                  "value": "channel_wipe"
+                },
+                {
+                  "name": "Role wipe",
+                  "value": "role_wipe"
+                },
+                {
+                  "name": "Ban wave",
+                  "value": "ban_wave"
+                },
+                {
+                  "name": "Webhook + @everyone spam",
+                  "value": "webhook_spam"
+                },
+                {
+                  "name": "Malicious bot",
+                  "value": "malicious_bot"
+                },
+                {
+                  "name": "Privilege escalation",
+                  "value": "privilege_escalation"
+                },
+                {
+                  "name": "Full nuke",
+                  "value": "full_nuke"
+                },
+                {
+                  "name": "Slow nuke",
+                  "value": "slow_nuke"
+                }
+              ],
+              "name": "scenario",
+              "description": "Attack to simulate",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "name": "antinuke",
+      "description": "Anti-Nuke: stop rogue admins, bots and hacked accounts.",
+      "default_member_permissions": "32",
+      "type": 1
+    },
+    {
+      "module": "antinuke",
+      "permission": "extra_owner",
+      "permissionLabel": "Server owner or extra owner",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "type": 1,
+          "name": "add",
+          "description": "Whitelist a user or bot for chosen actions.",
+          "options": [
+            {
+              "name": "user",
+              "description": "User or bot",
+              "required": true,
+              "type": 6
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "remove",
+          "description": "Remove a user or bot from the whitelist.",
+          "options": [
+            {
+              "name": "user",
+              "description": "User or bot",
+              "required": true,
+              "type": 6
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "list",
+          "description": "Show extra owners and the whitelist.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "clear",
+          "description": "Remove everyone from the whitelist.",
+          "options": []
+        }
+      ],
+      "name": "whitelist",
+      "description": "Anti-Nuke whitelist: who may do which protected actions.",
+      "default_member_permissions": "32",
+      "type": 1
+    },
+    {
+      "module": "antinuke",
+      "permission": "owner",
+      "permissionLabel": "Server owner",
+      "subcommandPermissions": {
+        "list": "extra_owner"
+      },
+      "options": [
+        {
+          "type": 1,
+          "name": "add",
+          "description": "Make someone an extra owner.",
+          "options": [
+            {
+              "name": "user",
+              "description": "Member",
+              "required": true,
+              "type": 6
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "remove",
+          "description": "Remove an extra owner.",
+          "options": [
+            {
+              "name": "user",
+              "description": "Member",
+              "required": true,
+              "type": 6
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "list",
+          "description": "Show extra owners and the whitelist.",
+          "options": []
+        }
+      ],
+      "name": "extraowner",
+      "description": "Extra owners manage Anti-Nuke and are fully trusted (server owner only).",
+      "default_member_permissions": "32",
+      "type": 1
+    },
+    {
+      "module": "antinuke",
+      "permission": "everyone",
+      "permissionLabel": "Everyone",
+      "subcommandPermissions": {
+        "status": "moderator",
+        "end": "extra_owner",
+        "authorize": "extra_owner",
+        "unauthorize": "extra_owner"
+      },
+      "options": [
+        {
+          "type": 1,
+          "name": "start",
+          "description": "Lock the server down now.",
+          "options": [
+            {
+              "type": 3,
+              "name": "reason",
+              "description": "What is happening",
+              "required": false,
+              "max_length": 200
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "end",
+          "description": "End emergency mode and restore everything QUILL changed.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "status",
+          "description": "Is emergency mode active?",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "authorize",
+          "description": "Allow someone (max 5) to start emergency mode.",
+          "options": [
+            {
+              "name": "user",
+              "description": "Member",
+              "required": true,
+              "type": 6
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "unauthorize",
+          "description": "Remove someone from the emergency list.",
+          "options": [
+            {
+              "name": "user",
+              "description": "Member",
+              "required": true,
+              "type": 6
+            }
+          ]
+        }
+      ],
+      "name": "emergency",
+      "description": "Emergency mode: strip dangerous permissions from every role until it is safe.",
+      "default_member_permissions": "32",
+      "type": 1
+    },
+    {
+      "module": "backup",
+      "permission": "extra_owner",
+      "permissionLabel": "Server owner or extra owner",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "type": 1,
+          "name": "create",
+          "description": "Take a snapshot now.",
+          "options": [
+            {
+              "type": 3,
+              "name": "label",
+              "description": "Name for this snapshot",
+              "required": false,
+              "max_length": 100
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "list",
+          "description": "List snapshots.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "view",
+          "description": "Show what a snapshot contains.",
+          "options": [
+            {
+              "autocomplete": true,
+              "type": 4,
+              "name": "id",
+              "description": "Snapshot",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "restore",
+          "description": "Rebuild the server from a snapshot.",
+          "options": [
+            {
+              "autocomplete": true,
+              "type": 4,
+              "name": "id",
+              "description": "Snapshot",
+              "required": true
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "Missing only — re-create deleted roles and channels",
+                  "value": "missing"
+                },
+                {
+                  "name": "Full — also reset permissions and server settings",
+                  "value": "full"
+                }
+              ],
+              "name": "mode",
+              "description": "What to restore (default: missing only)",
+              "required": false
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "delete",
+          "description": "Delete a snapshot.",
+          "options": [
+            {
+              "autocomplete": true,
+              "type": 4,
+              "name": "id",
+              "description": "Snapshot",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "name": "backup",
+      "description": "Server snapshots: roles, channels, permissions and settings — restore after a nuke.",
+      "default_member_permissions": "32",
+      "type": 1
+    },
+    {
+      "module": "antinuke",
+      "permission": "moderator",
+      "permissionLabel": "Moderator",
+      "subcommandPermissions": {
+        "resolve": "extra_owner"
+      },
+      "options": [
+        {
+          "type": 1,
+          "name": "list",
+          "description": "Recent incidents.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "view",
+          "description": "Show an incident and its timeline.",
+          "options": [
+            {
+              "min_value": 1,
+              "type": 4,
+              "name": "number",
+              "description": "Incident number",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "resolve",
+          "description": "Mark an incident as resolved.",
+          "options": [
+            {
+              "min_value": 1,
+              "type": 4,
+              "name": "number",
+              "description": "Incident number",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "name": "incident",
+      "description": "Anti-Nuke and Anti-Raid incidents with their timelines.",
+      "default_member_permissions": "1099511627776",
+      "type": 1
+    },
+    {
+      "module": "antiraid",
+      "permission": "manager",
+      "permissionLabel": "Manage Server",
+      "subcommandPermissions": {},
+      "options": [
+        {
+          "type": 1,
+          "name": "status",
+          "description": "Show Anti-Raid settings and raid mode.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "enable",
+          "description": "Turn Anti-Raid on.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "disable",
+          "description": "Turn Anti-Raid off.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "start",
+          "description": "Start raid mode now.",
+          "options": [
+            {
+              "max_value": 1440,
+              "min_value": 1,
+              "type": 4,
+              "name": "minutes",
+              "description": "How long",
+              "required": false
+            },
+            {
+              "type": 3,
+              "name": "reason",
+              "description": "Why",
+              "required": false,
+              "max_length": 200
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "end",
+          "description": "End raid mode.",
+          "options": []
+        },
+        {
+          "type": 1,
+          "name": "settings",
+          "description": "Tune raid detection and responses.",
+          "options": [
+            {
+              "max_value": 500,
+              "min_value": 2,
+              "type": 4,
+              "name": "join_count",
+              "description": "Joins that start raid mode",
+              "required": false
+            },
+            {
+              "max_value": 600,
+              "min_value": 1,
+              "type": 4,
+              "name": "join_seconds",
+              "description": "…within this many seconds",
+              "required": false
+            },
+            {
+              "name": "auto_raid_mode",
+              "description": "Start raid mode automatically",
+              "required": false,
+              "type": 5
+            },
+            {
+              "max_value": 1440,
+              "min_value": 1,
+              "type": 4,
+              "name": "raid_minutes",
+              "description": "Raid mode length",
+              "required": false
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "None (only delete / add risk)",
+                  "value": "none"
+                },
+                {
+                  "name": "Warn",
+                  "value": "warn"
+                },
+                {
+                  "name": "Timeout",
+                  "value": "timeout"
+                },
+                {
+                  "name": "Quarantine",
+                  "value": "quarantine"
+                },
+                {
+                  "name": "Remove roles",
+                  "value": "strip_roles"
+                },
+                {
+                  "name": "Kick",
+                  "value": "kick"
+                },
+                {
+                  "name": "Softban (kick + delete messages)",
+                  "value": "softban"
+                },
+                {
+                  "name": "Ban",
+                  "value": "ban"
+                }
+              ],
+              "name": "raid_action",
+              "description": "Action on joins during a raid",
+              "required": false
+            },
+            {
+              "type": 3,
+              "name": "raid_duration",
+              "description": "Timeout length for the raid action, e.g. 1h",
+              "required": false
+            },
+            {
+              "name": "pause_invites",
+              "description": "Pause invites during a raid",
+              "required": false,
+              "type": 5
+            },
+            {
+              "name": "tighten_antinuke",
+              "description": "Halve Anti-Nuke limits during a raid",
+              "required": false,
+              "type": 5
+            },
+            {
+              "max_value": 365,
+              "min_value": 0,
+              "type": 4,
+              "name": "min_account_age",
+              "description": "Filter accounts younger than N days (0 = off)",
+              "required": false
+            },
+            {
+              "name": "require_avatar",
+              "description": "Filter accounts without an avatar",
+              "required": false,
+              "type": 5
+            },
+            {
+              "name": "similar_names",
+              "description": "Filter look-alike username waves",
+              "required": false,
+              "type": 5
+            },
+            {
+              "type": 3,
+              "choices": [
+                {
+                  "name": "None (only delete / add risk)",
+                  "value": "none"
+                },
+                {
+                  "name": "Warn",
+                  "value": "warn"
+                },
+                {
+                  "name": "Timeout",
+                  "value": "timeout"
+                },
+                {
+                  "name": "Quarantine",
+                  "value": "quarantine"
+                },
+                {
+                  "name": "Remove roles",
+                  "value": "strip_roles"
+                },
+                {
+                  "name": "Kick",
+                  "value": "kick"
+                },
+                {
+                  "name": "Softban (kick + delete messages)",
+                  "value": "softban"
+                },
+                {
+                  "name": "Ban",
+                  "value": "ban"
+                }
+              ],
+              "name": "filter_action",
+              "description": "Action for filtered joins",
+              "required": false
+            },
+            {
+              "type": 3,
+              "name": "filter_duration",
+              "description": "Timeout length for the filter action, e.g. 1h",
+              "required": false
+            }
+          ]
+        }
+      ],
+      "name": "antiraid",
+      "description": "Anti-Raid: join spikes, raid mode and join filters.",
+      "default_member_permissions": "32",
       "type": 1
     }
   ]
